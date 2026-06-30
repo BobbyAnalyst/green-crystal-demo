@@ -231,12 +231,12 @@
   }
   .cell {
     aspect-ratio: 1 / 1;        /* square cells; rows auto-size to keep the grid square */
-    padding: 7%;                /* the item fills this padded box, so it can't exceed the cell */
+    padding: 7%;
     background: var(--cell);
     border: 1px solid var(--cell-line);
     border-radius: 8px;
     position: relative;
-    display: grid; place-items: stretch;
+    display: grid; place-items: center;
     transition: background 80ms ease;
     user-select: none;
   }
@@ -250,6 +250,7 @@
     width: 100%;
     height: 100%;
     min-width: 0;
+    overflow: hidden;           /* a too-wide glyph is clipped, never widens the tile */
     border-radius: 18%;
     background: linear-gradient(180deg, #fff, #e6e6e6);
     border: 2px solid #6e4a1f;
@@ -265,9 +266,12 @@
   /* glyph is absolutely centred so its width can never stretch the tile */
   .item > .glyph {
     position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 22px; line-height: 1;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-bottom: 18%;        /* lift the glyph clear of the bottom label */
+    font-size: 21px; line-height: 1;
     pointer-events: none;
   }
   /* a max-tier order item shows its label in red */
