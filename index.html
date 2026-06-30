@@ -7,7 +7,7 @@
 <style>
   :root {
     --phone-w: 414px;
-    --phone-h: 896px;
+    --phone-h: 800px;
     --peach: #f3e4c2;
     --brown: #6e4a1f;
     --brown-d: #4a2a0a;
@@ -215,21 +215,22 @@
     flex: 1 1 auto;
     min-height: 0;
     display: flex;
+    align-items: flex-start;
+    justify-content: center;
   }
   .board {
-    flex: 1 1 auto;
-    min-width: 0;
+    width: 100%;
     padding: 8px;
     background: linear-gradient(180deg, var(--board-a), var(--board-b));
     border: 3px solid #2f7ba4;
     border-radius: 16px;
     display: grid;
-    grid-template-columns: repeat(7, minmax(0, 1fr));  /* 7 columns that always divide the width */
-    grid-template-rows: repeat(9, minmax(0, 1fr));     /* 9 rows */
+    grid-template-columns: repeat(7, minmax(0, 1fr));  /* 7 equal columns, always divide the width */
     gap: 4px;
     overflow: hidden;
   }
   .cell {
+    aspect-ratio: 1 / 1;        /* square cells; rows auto-size to keep the grid square */
     background: var(--cell);
     border: 1px solid var(--cell-line);
     border-radius: 8px;
