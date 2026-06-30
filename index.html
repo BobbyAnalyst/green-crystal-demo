@@ -72,7 +72,7 @@
     position: relative; z-index: 2;
     padding: 14px 12px 4px;
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr auto;
+    grid-template-columns: 1fr 1fr auto;
     gap: 6px;
     align-items: center;
   }
@@ -114,12 +114,9 @@
   }
   .pill.energy .badge { background: linear-gradient(180deg, #b4e0ff, #5fb3ff); color: #fff; }
   .pill.energy .badge::before { content: '⚡'; filter: drop-shadow(0 1px 0 #0006); }
-  .pill.greenstone .badge { background: radial-gradient(circle at 35% 30%, #eafff0, #57e08a 55%, #1f9d52); color: #fff; }
-  .pill.greenstone .badge::before { content: '💎'; filter: hue-rotate(85deg) saturate(1.5); font-size: 14px; }
   .pill.coin   .badge { background: linear-gradient(180deg, #fff0a8, #ffcd34); color: #6a4a00; }
   .pill.coin   .badge::before { content: '🪙'; font-size: 14px; }
   .pill.energy { padding-right: 22px; }
-  .pill.greenstone { padding-right: 10px; }
   .pill.coin  { padding-right: 22px; }
 
   .cog {
@@ -227,7 +224,7 @@
     border-radius: 16px;
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    grid-template-rows: repeat(8, 1fr);
+    grid-template-rows: repeat(9, 1fr);
     gap: 4px;
     overflow: hidden;
   }
@@ -306,7 +303,16 @@
     border-color: #14753b;
     box-shadow: 0 0 11px #6ef0a0, 0 2px 0 rgba(0,0,0,.18);
   }
-  .item.greenstone .glyph { filter: hue-rotate(85deg) saturate(1.6) drop-shadow(0 0 4px #d6ffe6); }
+  /* Green crystal glyph — drawn as a real green gem (no emoji hue-rotate) */
+  .xtl {
+    display: inline-block; width: 1.05em; height: 1.05em; vertical-align: middle;
+    background: linear-gradient(135deg, #eafff2 0%, #76ef9f 42%, #1f9d52 100%);
+    clip-path: polygon(50% 1%, 84% 35%, 50% 99%, 16% 35%);
+    filter: drop-shadow(0 0 3px #9bf0bd);
+  }
+  .item.greenstone .xtl { width: 30px; height: 30px; }
+  .coach .xtl { width: 30px; height: 30px; }
+  .swatch .xtl { width: 18px; height: 18px; }
   .item.greenstone .type-tag { background: #14753b; color: #eafff0; border-color: #eafff0; }
 
   /* upgrade flash */
@@ -465,7 +471,7 @@
     display: grid; place-items: center; font-size: 15px;
     border: 2px solid #6e4a1f;
   }
-  .swatch.greenstone { background: radial-gradient(circle at 35% 28%, #f2fff6, #57e08a 45%, #1f9d52 78%); border-color:#14753b; }
+  .swatch.greenstone { background: #8ed5f0; }
   .swatch.order { background: linear-gradient(180deg,#fff,#e6e6e6); }
   .swatch.container { background: radial-gradient(circle at 50% 28%, #fff, #d7b384 60%, #b07e3e); }
   .swatch.chest { background: radial-gradient(circle at 50% 28%, #ffe9a8, #e8b34a 65%, #b07e1e); }
@@ -537,7 +543,6 @@
 
       <div class="hud">
         <div class="pill energy"><span class="badge"></span>310<span class="plus">+</span></div>
-        <div class="pill greenstone"><span class="badge"></span><span id="gcCount">4</span></div>
         <div class="pill coin"><span class="badge"></span>1096<span class="plus">+</span></div>
         <button class="cog" aria-label="Settings">⚙</button>
       </div>
@@ -567,7 +572,7 @@
       <!-- first-use tutorial -->
       <div class="tut-veil" id="tutVeil">
         <div class="coach">
-          <div class="hand">👆💎</div>
+          <div class="hand">👆 <span class="xtl"></span></div>
           <h4>Green Crystal</h4>
           <p>Drag it onto a regular item to upgrade it one tier. It will not work on producers, chests, or currency.</p>
           <div class="hint">Tap anywhere to continue</div>
@@ -594,7 +599,7 @@
     <div class="card">
       <h3>What is on the board</h3>
       <div class="legend">
-        <div class="row"><span class="swatch greenstone">💎</span> <span><b>Green Crystal</b> — drag me</span><span class="tag ok">grant</span></div>
+        <div class="row"><span class="swatch greenstone"><span class="xtl"></span></span> <span><b>Green Crystal</b> — drag me</span><span class="tag ok">grant</span></div>
         <div class="row"><span class="swatch order">🧼</span> <span><b>Order items</b> — Soap, Tools, Cleaning, Cookies, Toys</span><span class="tag ok">upgrades</span></div>
         <div class="row"><span class="swatch container">🧺</span> <span><b>Cleaning Set</b> — producer / container</span><span class="tag no">refuses</span></div>
         <div class="row"><span class="swatch chest">🎁</span> <span><b>Chest</b></span><span class="tag no">refuses</span></div>
@@ -686,7 +691,7 @@ const BLOCKED = {
   gem:      { kind: 'gem',       id: '201_06',glyph: '💎', tag: 'T6 GEM',   name: 'Merge Stone' }
 };
 
-/* Initial board. 7 cols × 8 rows, indices 0–55.  GC = Green Crystal */
+/* Initial board. 7 cols × 9 rows, indices 0–62.  GC = Green Crystal */
 const INITIAL = {
   8:  { kind: 'gc' },
   10: { kind: 'order', f: 'soap',   t: 2 },
@@ -708,7 +713,7 @@ const INITIAL = {
   50: { kind: 'gc' }
 };
 
-const CELLS = 56;
+const CELLS = 63;
 
 const board   = document.getElementById('board');
 const ghost   = document.getElementById('ghost');
@@ -744,7 +749,7 @@ function makePiece(data) {
   el.dataset.kind = data.kind;
   if (data.kind === 'gc') {
     el.className = 'item greenstone';
-    el.innerHTML = '<span class="glyph">💎</span><span class="type-tag">GREEN</span>';
+    el.innerHTML = '<span class="xtl"></span><span class="type-tag">GREEN</span>';
   } else if (data.kind === 'blocked') {
     const b = BLOCKED[data.b];
     el.className = 'item ' + b.kind;
@@ -761,7 +766,8 @@ function makePiece(data) {
   return el;
 }
 function refreshGcCount() {
-  document.getElementById('gcCount').textContent = board.querySelectorAll('.item.greenstone').length;
+  const el = document.getElementById('gcCount');
+  if (el) el.textContent = board.querySelectorAll('.item.greenstone').length;
 }
 
 /* ── Classify a Green Crystal drop ───────────────────────── */
