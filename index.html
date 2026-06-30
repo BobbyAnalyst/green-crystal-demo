@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Mergedom — Green Crystal Demo</title>
+<title>Mergedom — Crystal Demo</title>
 <style>
   :root {
     --phone-w: 414px;
@@ -231,11 +231,12 @@
   }
   .cell {
     aspect-ratio: 1 / 1;        /* square cells; rows auto-size to keep the grid square */
+    padding: 7%;                /* the item fills this padded box, so it can't exceed the cell */
     background: var(--cell);
     border: 1px solid var(--cell-line);
     border-radius: 8px;
     position: relative;
-    display: grid; place-items: center;
+    display: grid; place-items: stretch;
     transition: background 80ms ease;
     user-select: none;
   }
@@ -246,48 +247,51 @@
   .cell.drop-bad     { background: #ff8a8a; box-shadow: inset 0 0 0 2px #b22f2f; }
 
   .item {
-    width: 84%;
-    height: 84%;
-    border-radius: 10px;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    border-radius: 18%;
     background: linear-gradient(180deg, #fff, #e6e6e6);
     border: 2px solid #6e4a1f;
     box-shadow: 0 2px 0 rgba(0,0,0,.18);
     display: grid; place-items: center;
     position: relative;
     cursor: grab;
-    font-size: 23px;
+    font-size: 21px;
     line-height: 1;
     touch-action: none;
   }
   .item:active { cursor: grabbing; }
-  .item .tier-pill {
+  /* glyph is absolutely centred so its width can never stretch the tile */
+  .item > .glyph {
     position: absolute;
-    top: -6px; right: -6px;
-    background: #4a2a0a;
-    color: #ffe7a8;
-    font-size: 10px; font-weight: 800;
-    padding: 1px 5px;
-    border-radius: 999px;
-    border: 1px solid #ffe7a8;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 22px; line-height: 1;
+    pointer-events: none;
   }
-  .item.maxed .tier-pill { background: #7a1f1f; color: #ffd0d0; border-color: #ffd0d0; }
+  /* a max-tier order item shows its label in red */
+  .item .lbl.max { background: rgba(110,20,20,.9); color: #ffd6d6; }
   .item.dragging { opacity: .25; }
 
   /* Producers / chests / currency — the blocked targets */
   .item.container { background: radial-gradient(circle at 50% 28%, #fff, #d7b384 60%, #b07e3e); border-color: #6e4a1f; }
   .item.chest     { background: radial-gradient(circle at 50% 28%, #ffe9a8, #e8b34a 65%, #b07e1e); border-color: #6e4a1f; }
   .item.currency  { background: radial-gradient(circle at 50% 28%, #fff, #d8dde2 60%, #aab2bb); border-color: #586068; }
-  .item .type-tag {
+  .item .lbl {
     position: absolute;
-    bottom: -5px; left: 50%;
+    left: 50%; bottom: 7%;
     transform: translateX(-50%);
-    background: #4a2a0a;
-    color: #ffd9a8;
-    font-size: 7px; font-weight: 800; letter-spacing: .2px;
-    padding: 1px 4px;
+    background: rgba(20,12,4,.85);
+    color: #ffe7a8;
+    font-size: 6.5px; font-weight: 800; letter-spacing: .2px;
+    padding: 0.5px 4px;
     border-radius: 999px;
-    border: 1px solid #ffd9a8;
+    line-height: 1.5;
     white-space: nowrap;
+    max-width: 86%;
+    overflow: hidden;
+    text-align: center;
   }
 
   /* Blue gem (T6 merge stone) — for contrast, also a blocked target */
@@ -296,7 +300,6 @@
     border-color: #1a5b87;
     box-shadow: 0 2px 0 rgba(0,0,0,.18);
   }
-  .item.gem .type-tag { background: #c98a1c; color: #fff; border-color: #fff; }
   .item.gem .glyph { filter: drop-shadow(0 0 4px #fff); }
 
   /* Green Crystal (greenstone) — the hero item */
@@ -312,10 +315,9 @@
     clip-path: polygon(50% 1%, 84% 35%, 50% 99%, 16% 35%);
     filter: drop-shadow(0 1px 1px rgba(0,0,0,.3));
   }
-  .item.greenstone .xtl { width: 64%; height: 64%; }
+  .item.greenstone .xtl { width: 58%; aspect-ratio: 1 / 1; height: auto; }
   .coach .xtl { width: 30px; height: 30px; }
   .swatch .xtl { width: 18px; height: 18px; }
-  .item.greenstone .type-tag { background: #14753b; color: #eafff0; border-color: #eafff0; }
 
   /* upgrade flash */
   @keyframes upgrade-flash {
@@ -561,7 +563,7 @@
       </div>
 
       <div class="banner">
-        <div class="info"><span id="infoText">Drag a Green Crystal onto a regular order item to upgrade it.</span></div>
+        <div class="info"><span id="infoText">Drag a Crystal onto a regular order item to upgrade it.</span></div>
       </div>
 
       <div class="board-wrap">
@@ -575,7 +577,7 @@
       <div class="tut-veil" id="tutVeil">
         <div class="coach">
           <div class="hand">👆 <span class="xtl"></span></div>
-          <h4>Green Crystal</h4>
+          <h4>Crystal</h4>
           <p>Drag it onto a regular item to upgrade it one tier. It will not work on producers, chests, or currency.</p>
           <div class="hint">Tap anywhere to continue</div>
         </div>
@@ -594,14 +596,14 @@
   <!-- ── Side panel ─────────────────────────────────────────── -->
   <div class="panel">
     <div>
-      <h1>Green Crystal — Order-Only Merge Booster</h1>
-      <p class="sub">Interactive prototype for the Mergedom PRD. Drag the green crystals on the board. Producers, chests, currency, and the blue gem refuse. Order items upgrade.</p>
+      <h1>Crystal — Order-Only Merge Booster</h1>
+      <p class="sub">Interactive prototype for the Mergedom PRD. Drag the crystals on the board. Producers, chests, currency, and the blue gem refuse. Order items upgrade.</p>
     </div>
 
     <div class="card">
       <h3>What is on the board</h3>
       <div class="legend">
-        <div class="row"><span class="swatch greenstone"><span class="xtl"></span></span> <span><b>Green Crystal</b> — drag me</span><span class="tag ok">grant</span></div>
+        <div class="row"><span class="swatch greenstone"><span class="xtl"></span></span> <span><b>Crystal</b> — drag me</span><span class="tag ok">grant</span></div>
         <div class="row"><span class="swatch order">🧼</span> <span><b>Order items</b> — Soap, Tools, Cleaning, Cookies, Toys</span><span class="tag ok">upgrades</span></div>
         <div class="row"><span class="swatch container">🧺</span> <span><b>Cleaning Set</b> — producer / container</span><span class="tag no">refuses</span></div>
         <div class="row"><span class="swatch chest">🎁</span> <span><b>Chest</b></span><span class="tag no">refuses</span></div>
@@ -684,13 +686,14 @@ const FAMILIES = {
   toy:    { name: 'Toy Animals',    idp: '41', glyph: '🧸', maxTier: 9  }
 };
 
-/* Blocked pieces carry an explicit id + glyph + tag label */
+/* Blocked pieces are clean glyph tiles (like the previous demos). Only the
+   blue gem carries a small contained label, for contrast with the Crystal. */
 const BLOCKED = {
-  cleanset: { kind: 'container', id: '10_04', glyph: '🧺', tag: 'PRODUCER', name: 'Cleaning Set' },
-  chest:    { kind: 'chest',     id: '62_01', glyph: '🎁', tag: 'CHEST',    name: 'Safe Box' },
-  coin:     { kind: 'currency',  id: '5_03',  glyph: '🪙', tag: 'COINS',    name: 'Coins' },
-  energy:   { kind: 'currency',  id: '4_02',  glyph: '⚡', tag: 'ENERGY',   name: 'Energy' },
-  gem:      { kind: 'gem',       id: '201_06',glyph: '💎', tag: 'T6 GEM',   name: 'Merge Stone' }
+  cleanset: { kind: 'container', id: '10_04', glyph: '🧺', name: 'Cleaning Set' },
+  chest:    { kind: 'chest',     id: '62_01', glyph: '🎁', name: 'Safe Box' },
+  coin:     { kind: 'currency',  id: '5_03',  glyph: '🪙', name: 'Coins' },
+  energy:   { kind: 'currency',  id: '4_02',  glyph: '⚡', name: 'Energy' },
+  gem:      { kind: 'gem',       id: '201_06',glyph: '💎', lbl: 'T6', name: 'Merge Stone' }
 };
 
 /* Initial board. 7 cols × 9 rows, indices 0–62.  GC = Green Crystal */
@@ -751,19 +754,19 @@ function makePiece(data) {
   el.dataset.kind = data.kind;
   if (data.kind === 'gc') {
     el.className = 'item greenstone';
-    el.innerHTML = '<span class="xtl"></span><span class="type-tag">GREEN</span>';
+    el.innerHTML = '<span class="xtl"></span><span class="lbl">Crystal</span>';
   } else if (data.kind === 'blocked') {
     const b = BLOCKED[data.b];
     el.className = 'item ' + b.kind;
     el.dataset.block = data.b;
     el.dataset.id = b.id;
-    el.innerHTML = '<span class="glyph">' + b.glyph + '</span><span class="type-tag">' + b.tag + '</span>';
+    el.innerHTML = '<span class="glyph">' + b.glyph + '</span>' + (b.lbl ? '<span class="lbl">' + b.lbl + '</span>' : '');
   } else { // order
     const fam = FAMILIES[data.f];
     el.className = 'item order' + (data.t >= fam.maxTier ? ' maxed' : '');
     el.dataset.family = data.f;
     el.dataset.tier = String(data.t);
-    el.innerHTML = '<span class="glyph">' + fam.glyph + '</span><span class="tier-pill">Lv ' + data.t + '</span>';
+    el.innerHTML = '<span class="glyph">' + fam.glyph + '</span><span class="lbl' + (data.t >= fam.maxTier ? ' max' : '') + '">Lv ' + data.t + '</span>';
   }
   return el;
 }
