@@ -5,582 +5,215 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>Mergedom — Crystal Demo</title>
 <style>
-  :root {
-    --phone-w: 414px;
-    --phone-h: 800px;
-    --peach: #f3e4c2;
-    --brown: #6e4a1f;
-    --brown-d: #4a2a0a;
-    --ink: #2a1d0f;
-    --board-a: #6cc6f0;
-    --board-b: #4ea7d2;
-    --cell:   #8ed5f0;
-    --cell-line: #6fb8d6;
-    --green: #4cb944;
-    --green-d: #2f8a2a;
-    --red: #e64545;
-    --red-d: #b22f2f;
-    --amber: #e0941a;
-    --amber-d: #a86c0e;
-    --gold: #f4c33b;
-    --shadow: 0 8px 0 rgba(0,0,0,0.18), 0 14px 30px rgba(0,0,0,0.35);
+  :root{
+    --peach:#f3e4c2; --brown:#6e4a1f; --brown-d:#4a2a0a; --ink:#2a1d0f;
+    --board-a:#6cc6f0; --board-b:#4ea7d2; --cell:#8ed5f0; --cell-line:#6fb8d6;
+    --green:#4cb944; --green-d:#2f8a2a; --red:#e64545; --red-d:#b22f2f;
   }
-  * { box-sizing: border-box; }
-  html, body { margin: 0; padding: 0; }
-  body {
-    min-height: 100vh;
-    background: radial-gradient(1200px 600px at 20% 0%, #1d2a44 0%, #0e1726 60%) fixed, #0e1726;
-    color: #e8e8ee;
-    font: 14px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 26px;
-    justify-content: center;
-    align-items: flex-start;
-    padding: 32px 16px 60px;
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    min-height:100vh;
+    background:radial-gradient(1200px 600px at 20% 0%,#1d2a44 0%,#0e1726 60%) fixed,#0e1726;
+    color:#e8e8ee;
+    font:14px/1.4 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    display:flex; flex-wrap:wrap; gap:26px; justify-content:center; align-items:flex-start;
+    padding:28px 16px 60px;
   }
 
-  /* ── Phone frame ──────────────────────────────────────────── */
-  .phone {
-    width: var(--phone-w);
-    height: var(--phone-h);
-    border-radius: 44px;
-    background: #111;
-    padding: 12px;
-    box-shadow: 0 30px 80px rgba(0,0,0,0.6), 0 0 0 2px #1a1a1a inset;
-    position: relative;
-    flex: 0 0 auto;
-  }
-  .screen {
-    position: relative;
-    width: 100%; height: 100%;
-    border-radius: 32px;
-    overflow: hidden;
-    background: linear-gradient(180deg, #cfdfe8 0%, #c1d3df 6%, #bfd1de 12%, #aac3d3 12.1%);
-    display: flex;
-    flex-direction: column;
-  }
-  .room-bg {
-    position: absolute;
-    left: 0; right: 0; top: 0; height: 30%;
-    background: radial-gradient(120% 70% at 50% 100%, #bfd6e1 0%, #aac3d3 70%, #92b0c2 100%);
-    z-index: 0;
-  }
+  /* ---------- Phone ---------- */
+  .phone{ width:400px; height:812px; flex:0 0 auto; border-radius:42px; background:#111;
+    padding:11px; box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 0 2px #1a1a1a inset; position:relative; }
+  .screen{ position:relative; width:100%; height:100%; border-radius:31px; overflow:hidden;
+    background:linear-gradient(180deg,#cfdfe8 0%,#bfd1de 12%,#aac3d3 12.1%); display:flex; flex-direction:column; }
+  .room-bg{ position:absolute; left:0; right:0; top:0; height:28%;
+    background:radial-gradient(120% 70% at 50% 100%,#bfd6e1 0%,#aac3d3 70%,#92b0c2 100%); z-index:0; }
 
   /* HUD */
-  .hud {
-    position: relative; z-index: 2;
-    padding: 14px 12px 4px;
-    display: grid;
-    grid-template-columns: 1fr 1fr auto;
-    gap: 6px;
-    align-items: center;
-  }
-  .pill {
-    background: #fff7e6;
-    border: 2.5px solid var(--brown);
-    border-radius: 999px;
-    padding: 3px 10px 3px 28px;
-    font-weight: 800;
-    font-size: 14px;
-    color: var(--ink);
-    position: relative;
-    box-shadow: 0 2px 0 rgba(0,0,0,.18);
-    text-align: center;
-  }
-  .pill .badge {
-    position: absolute;
-    left: -6px; top: 50%;
-    transform: translateY(-50%);
-    width: 30px; height: 30px;
-    border-radius: 50%;
-    border: 2.5px solid var(--brown);
-    display: grid; place-items: center;
-    font-size: 16px;
-    box-shadow: 0 2px 0 rgba(0,0,0,.2);
-  }
-  .pill .plus {
-    position: absolute;
-    right: -8px; top: 50%;
-    transform: translateY(-50%);
-    width: 22px; height: 22px;
-    border-radius: 50%;
-    background: linear-gradient(180deg, #6ed664, var(--green));
-    border: 2px solid var(--green-d);
-    color: #fff; font-weight: 900; font-size: 16px;
-    display: grid; place-items: center;
-    box-shadow: 0 2px 0 rgba(0,0,0,.2);
-    line-height: 0;
-  }
-  .pill.energy .badge { background: linear-gradient(180deg, #b4e0ff, #5fb3ff); color: #fff; }
-  .pill.energy .badge::before { content: '⚡'; filter: drop-shadow(0 1px 0 #0006); }
-  .pill.coin   .badge { background: linear-gradient(180deg, #fff0a8, #ffcd34); color: #6a4a00; }
-  .pill.coin   .badge::before { content: '🪙'; font-size: 14px; }
-  .pill.energy { padding-right: 22px; }
-  .pill.coin  { padding-right: 22px; }
-
-  .cog {
-    width: 38px; height: 38px;
-    border-radius: 50%;
-    background: linear-gradient(180deg, #c8d8e6, #93afc2);
-    border: 2.5px solid #4f6d80;
-    color: #fff;
-    display: grid; place-items: center;
-    font-size: 18px;
-    box-shadow: 0 3px 0 rgba(0,0,0,.25);
-    cursor: pointer;
-  }
+  .hud{ position:relative; z-index:2; padding:12px 12px 4px; display:grid;
+    grid-template-columns:1fr 1fr auto; gap:8px; align-items:center; }
+  .pill{ background:#fff7e6; border:2.5px solid var(--brown); border-radius:999px;
+    padding:3px 12px 3px 30px; font-weight:800; font-size:14px; color:var(--ink); position:relative;
+    box-shadow:0 2px 0 rgba(0,0,0,.18); text-align:center; }
+  .pill .badge{ position:absolute; left:-6px; top:50%; transform:translateY(-50%); width:30px; height:30px;
+    border-radius:50%; border:2.5px solid var(--brown); display:grid; place-items:center;
+    box-shadow:0 2px 0 rgba(0,0,0,.2); overflow:hidden; }
+  .pill .badge svg{ width:20px; height:20px; }
+  .pill .plus{ position:absolute; right:-8px; top:50%; transform:translateY(-50%); width:22px; height:22px;
+    border-radius:50%; background:linear-gradient(180deg,#6ed664,var(--green)); border:2px solid var(--green-d);
+    color:#fff; font-weight:900; font-size:16px; display:grid; place-items:center; box-shadow:0 2px 0 rgba(0,0,0,.2); }
+  .pill.energy .badge{ background:linear-gradient(180deg,#b4e0ff,#5fb3ff); }
+  .pill.coin .badge{ background:linear-gradient(180deg,#fff0a8,#ffcd34); }
+  .pill.energy{ padding-right:22px } .pill.coin{ padding-right:22px }
+  .cog{ width:38px; height:38px; border-radius:50%; background:linear-gradient(180deg,#c8d8e6,#93afc2);
+    border:2.5px solid #4f6d80; color:#fff; display:grid; place-items:center; font-size:18px;
+    box-shadow:0 3px 0 rgba(0,0,0,.25); cursor:pointer; }
 
   /* Orders */
-  .avatars {
-    position: relative; z-index: 2;
-    margin: 8px 10px 0;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    align-items: center;
-    gap: 14px;
-  }
-  .order {
-    position: relative;
-    background: linear-gradient(180deg, #fffbe9, #f3e4c2);
-    border: 2.5px solid var(--brown);
-    border-radius: 18px;
-    padding: 6px 10px 6px 64px;
-    height: 70px;
-    box-shadow: 0 3px 0 rgba(0,0,0,.2);
-    display: flex; align-items: center; gap: 8px;
-    overflow: visible;
-  }
-  .npc {
-    position: absolute; left: -8px; top: 50%;
-    transform: translateY(-50%);
-    width: 64px; height: 72px;
-    background: linear-gradient(180deg, #bfd6e1, #8aabc1);
-    border: 2.5px solid #355a6f;
-    border-radius: 50% 50% 18px 18px / 60% 60% 18px 18px;
-    display: grid; place-items: end center;
-    font-size: 36px; line-height: 1;
-    overflow: hidden;
-  }
-  .npc.bearded::after { content: '🧔🏻'; font-size: 36px; margin-bottom: 4px; }
-  .npc.boy-npc {
-    background: linear-gradient(180deg, #efe1d2, #c79f7c);
-    border-color: #6e4a1f;
-  }
-  .npc.boy-npc::after { content: '👧'; font-size: 36px; margin-bottom: 4px; }
-  .order-slot {
-    width: 46px; height: 46px;
-    background: #fff7e6;
-    border: 2.5px solid var(--brown);
-    border-radius: 12px;
-    display: grid; place-items: center;
-    font-size: 24px;
-    margin-left: auto;
-    box-shadow: inset 0 -3px 0 rgba(0,0,0,.1);
-  }
+  .orders{ position:relative; z-index:2; margin:8px 10px 0; display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .order{ position:relative; background:linear-gradient(180deg,#fffbe9,#f3e4c2); border:2.5px solid var(--brown);
+    border-radius:18px; padding:6px 8px 6px 60px; height:64px; box-shadow:0 3px 0 rgba(0,0,0,.2);
+    display:flex; align-items:center; }
+  .npc{ position:absolute; left:-6px; top:50%; transform:translateY(-50%); width:58px; height:66px;
+    border:2.5px solid #355a6f; border-radius:50% 50% 16px 16px/60% 60% 16px 16px; display:grid; place-items:center; overflow:hidden;
+    background:linear-gradient(180deg,#bfd6e1,#8aabc1); font-size:30px; }
+  .npc.boy{ background:linear-gradient(180deg,#efe1d2,#c79f7c); border-color:#6e4a1f; }
+  .order .slot{ width:46px; height:46px; margin-left:auto; background:#fff7e6; border:2.5px solid var(--brown);
+    border-radius:12px; display:grid; place-items:center; box-shadow:inset 0 -3px 0 rgba(0,0,0,.1); }
+  .order .slot svg{ width:30px; height:30px; }
 
-  /* Info banner */
-  .banner {
-    position: relative; z-index: 2;
-    margin: 10px 10px 0;
-  }
-  .banner .info {
-    background: #fff7e6;
-    border: 2.5px solid var(--brown);
-    border-radius: 16px;
-    padding: 8px 12px 8px 46px;
-    color: var(--ink);
-    font-weight: 800; font-size: 13px;
-    position: relative;
-    box-shadow: 0 3px 0 rgba(0,0,0,.18);
-    display: flex; align-items: center;
-  }
-  .banner .info::before {
-    content: 'i';
-    position: absolute; left: 8px; top: 50%;
-    transform: translateY(-50%);
-    width: 28px; height: 28px;
-    background: linear-gradient(180deg, #6ec0ff, #2b8be6);
-    border: 2px solid #155a92;
-    border-radius: 50%;
-    color: #fff; font-style: italic; font-weight: 900;
-    display: grid; place-items: center;
-    box-shadow: 0 2px 0 rgba(0,0,0,.2);
-  }
+  /* Banner */
+  .banner{ position:relative; z-index:2; margin:10px 10px 0; }
+  .banner .info{ background:#fff7e6; border:2.5px solid var(--brown); border-radius:16px; padding:8px 12px 8px 46px;
+    color:var(--ink); font-weight:800; font-size:13px; position:relative; box-shadow:0 3px 0 rgba(0,0,0,.18); }
+  .banner .info::before{ content:'i'; position:absolute; left:8px; top:50%; transform:translateY(-50%); width:28px; height:28px;
+    background:linear-gradient(180deg,#6ec0ff,#2b8be6); border:2px solid #155a92; border-radius:50%;
+    color:#fff; font-style:italic; font-weight:900; display:grid; place-items:center; box-shadow:0 2px 0 rgba(0,0,0,.2); }
 
   /* Board */
-  .board-wrap {
-    position: relative; z-index: 1;
-    margin: 10px 10px 14px;
-    flex: 1 1 auto;
-    min-height: 0;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-  }
-  .board {
-    width: 100%;
-    padding: 8px;
-    background: linear-gradient(180deg, var(--board-a), var(--board-b));
-    border: 3px solid #2f7ba4;
-    border-radius: 16px;
-    display: grid;
-    grid-template-columns: repeat(7, minmax(0, 1fr));  /* 7 equal columns, always divide the width */
-    gap: 4px;
-    overflow: hidden;
-  }
-  .cell {
-    aspect-ratio: 1 / 1;        /* square cells; rows auto-size to keep the grid square */
-    padding: 7%;
-    background: var(--cell);
-    border: 1px solid var(--cell-line);
-    border-radius: 8px;
-    position: relative;
-    display: grid; place-items: center;
-    transition: background 80ms ease;
-    user-select: none;
-  }
-  .cell.drop-ok      { background: #ffe16a; box-shadow: inset 0 0 0 2px #c98a1c; }
-  .cell.drop-merge   { background: #b6f0a0; box-shadow: inset 0 0 0 2px #2f8a2a; }
-  .cell.drop-upgrade { background: #b6f0a0; box-shadow: inset 0 0 0 2px #2f8a2a; }
-  .cell.drop-block   { background: #ffd884; box-shadow: inset 0 0 0 2px #b86a14; }
-  .cell.drop-bad     { background: #ff8a8a; box-shadow: inset 0 0 0 2px #b22f2f; }
+  .reset{ position:absolute; right:12px; top:12px; z-index:5; background:rgba(255,255,255,.9); border:2px solid var(--brown);
+    border-radius:999px; padding:4px 10px; font-weight:800; font-size:11px; color:var(--ink); cursor:pointer; box-shadow:0 2px 0 rgba(0,0,0,.2); }
+  .board-wrap{ position:relative; z-index:1; margin:10px 10px 12px; flex:1 1 auto; min-height:0;
+    display:flex; align-items:flex-start; justify-content:center; }
+  .board{ width:100%; padding:7px; background:linear-gradient(180deg,var(--board-a),var(--board-b));
+    border:3px solid #2f7ba4; border-radius:16px; display:grid; grid-template-columns:repeat(7,minmax(0,1fr));
+    gap:5px; overflow:hidden; }
+  .cell{ aspect-ratio:1/1; background:var(--cell); border:1px solid var(--cell-line); border-radius:9px;
+    position:relative; display:grid; place-items:center; padding:7%; transition:background .08s; user-select:none; }
+  .cell.ok    { background:#ffe16a; box-shadow:inset 0 0 0 2px #c98a1c; }
+  .cell.merge { background:#b6f0a0; box-shadow:inset 0 0 0 2px #2f8a2a; }
+  .cell.up    { background:#b6f0a0; box-shadow:inset 0 0 0 2px #2f8a2a; }
+  .cell.block { background:#ffd884; box-shadow:inset 0 0 0 2px #b86a14; }
+  .cell.bad   { background:#ff8a8a; box-shadow:inset 0 0 0 2px #b22f2f; }
 
-  .item {
-    width: 100%;
-    height: 100%;
-    min-width: 0;
-    overflow: hidden;           /* a too-wide glyph is clipped, never widens the tile */
-    border-radius: 18%;
-    background: linear-gradient(180deg, #fff, #e6e6e6);
-    border: 2px solid #6e4a1f;
-    box-shadow: 0 2px 0 rgba(0,0,0,.18);
-    display: grid; place-items: center;
-    position: relative;
-    cursor: grab;
-    font-size: 21px;
-    line-height: 1;
-    touch-action: none;
-  }
-  .item:active { cursor: grabbing; }
-  /* glyph is absolutely centred so its width can never stretch the tile */
-  .item > .glyph {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding-bottom: 18%;        /* lift the glyph clear of the bottom label */
-    font-size: 21px; line-height: 1;
-    pointer-events: none;
-  }
-  /* a max-tier order item shows its label in red */
-  .item .lbl.max { background: rgba(110,20,20,.9); color: #ffd6d6; }
-  .item.dragging { opacity: .25; }
+  /* Tiles — the items */
+  .tile{ width:100%; height:100%; position:relative; border-radius:20%; cursor:grab; touch-action:none;
+    border:2.5px solid var(--brown); box-shadow:0 2px 0 rgba(0,0,0,.18), inset 0 3px 0 rgba(255,255,255,.45);
+    background:linear-gradient(180deg,#ffffff,#e9edf2); }
+  .tile:active{ cursor:grabbing }
+  .tile.dragging{ opacity:.25 }
+  .tile .ic{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; padding-bottom:16%; }
+  .tile .ic svg{ width:62%; height:62%; display:block; filter:drop-shadow(0 1px 1px rgba(0,0,0,.2)); }
+  .tile .lbl{ position:absolute; left:50%; bottom:6%; transform:translateX(-50%); max-width:90%; white-space:nowrap;
+    background:rgba(20,12,4,.85); color:#ffe7a8; font-size:7px; font-weight:800; letter-spacing:.3px;
+    padding:.5px 5px; border-radius:999px; line-height:1.5; }
+  .tile .lbl.max{ background:rgba(120,22,22,.92); color:#ffd6d6; }
+  .tile.t-crystal{ background:linear-gradient(180deg,#d6ffe6,#7ce0a2); border-color:#16703a; }
+  .tile.t-gem{ background:linear-gradient(180deg,#d6efff,#7cc4f0); border-color:#1a5f9e; }
+  .tile.t-container{ background:linear-gradient(180deg,#f6e6cb,#dcc093); border-color:#7a5326; }
+  .tile.t-chest{ background:linear-gradient(180deg,#ffeec0,#f0c878); border-color:#9a6a1e; }
+  .tile.t-currency{ background:linear-gradient(180deg,#fbfdff,#dde3ea); border-color:#586876; }
+  .tile.t-crystal .ic svg,.tile.t-gem .ic svg{ width:72%; height:72%; }
+  .tile.t-crystal .ic,.tile.t-gem .ic{ padding-bottom:14%; }
 
-  /* Producers / chests / currency — the blocked targets */
-  .item.container { background: radial-gradient(circle at 50% 28%, #fff, #d7b384 60%, #b07e3e); border-color: #6e4a1f; }
-  .item.chest     { background: radial-gradient(circle at 50% 28%, #ffe9a8, #e8b34a 65%, #b07e1e); border-color: #6e4a1f; }
-  .item.currency  { background: radial-gradient(circle at 50% 28%, #fff, #d8dde2 60%, #aab2bb); border-color: #586068; }
-  .item .lbl {
-    position: absolute;
-    left: 50%; bottom: 7%;
-    transform: translateX(-50%);
-    background: rgba(20,12,4,.85);
-    color: #ffe7a8;
-    font-size: 6.5px; font-weight: 800; letter-spacing: .2px;
-    padding: 0.5px 4px;
-    border-radius: 999px;
-    line-height: 1.5;
-    white-space: nowrap;
-    max-width: 86%;
-    overflow: hidden;
-    text-align: center;
-  }
+  @keyframes flash{ 0%{box-shadow:0 0 0 0 #b6ffccdd,inset 0 3px 0 rgba(255,255,255,.45);transform:scale(1)}
+    50%{box-shadow:0 0 18px 12px #8cf5b0aa,inset 0 3px 0 rgba(255,255,255,.45);transform:scale(1.18)}
+    100%{box-shadow:0 0 0 0 #b6ffcc00,inset 0 3px 0 rgba(255,255,255,.45);transform:scale(1)} }
+  .tile.flash{ animation:flash .6s ease; }
+  @keyframes shake{ 0%,100%{transform:translateX(0)} 20%{transform:translateX(-4px) rotate(-3deg)}
+    40%{transform:translateX(4px) rotate(3deg)} 60%{transform:translateX(-3px)} 80%{transform:translateX(3px)} }
+  .tile.shake{ animation:shake .36s ease; }
 
-  /* Blue gem (T6 merge stone) — for contrast, also a blocked target */
-  .item.gem {
-    background: radial-gradient(circle at 35% 30%, #fff, #6cf 40%, #19c 75%);
-    border-color: #1a5b87;
-    box-shadow: 0 2px 0 rgba(0,0,0,.18);
-  }
-  .item.gem .glyph { filter: drop-shadow(0 0 4px #fff); }
+  /* drag ghost */
+  #ghost{ position:fixed; left:0; top:0; width:50px; height:50px; pointer-events:none; z-index:9999; display:none; }
+  #ghost.on{ display:block }
 
-  /* Green Crystal (greenstone) — the hero item */
-  .item.greenstone {
-    background: radial-gradient(circle at 35% 28%, #f2fff6, #57e08a 45%, #1f9d52 78%);
-    border-color: #14753b;
-    box-shadow: 0 2px 0 rgba(0,0,0,.18);
-  }
-  /* Green crystal glyph — drawn as a real green gem (no emoji hue-rotate) */
-  .xtl {
-    display: inline-block; width: 1.05em; height: 1.05em; vertical-align: middle;
-    background: linear-gradient(135deg, #eafff2 0%, #76ef9f 42%, #1f9d52 100%);
-    clip-path: polygon(50% 1%, 84% 35%, 50% 99%, 16% 35%);
-    filter: drop-shadow(0 1px 1px rgba(0,0,0,.3));
-  }
-  .item.greenstone .xtl { width: 58%; aspect-ratio: 1 / 1; height: auto; }
-  .coach .xtl { width: 30px; height: 30px; }
-  .swatch .xtl { width: 18px; height: 18px; }
+  /* toast */
+  .toast{ position:absolute; left:50%; bottom:92px; transform:translateX(-50%) translateY(12px); max-width:86%;
+    background:rgba(34,22,8,.95); color:#fff7e6; border:2px solid #ffd9a8; border-radius:14px; padding:9px 16px;
+    font-weight:800; font-size:13px; text-align:center; box-shadow:0 6px 18px rgba(0,0,0,.4); opacity:0;
+    pointer-events:none; transition:opacity .16s,transform .16s; z-index:60; }
+  .toast.show{ opacity:1; transform:translateX(-50%) translateY(0) }
+  .toast.refuse{ border-color:#ff9a9a } .toast.block{ border-color:#ffcf7a } .toast.ok{ border-color:#9af0b4 }
 
-  /* upgrade flash */
-  @keyframes upgrade-flash {
-    0%   { box-shadow: 0 0 0 0 #b6ffccdd, 0 2px 0 rgba(0,0,0,.18); transform: scale(1); }
-    50%  { box-shadow: 0 0 20px 13px #8cf5b0aa, 0 2px 0 rgba(0,0,0,.18); transform: scale(1.2); }
-    100% { box-shadow: 0 0 0 0 #b6ffcc00, 0 2px 0 rgba(0,0,0,.18); transform: scale(1); }
-  }
-  .item.upgrading { animation: upgrade-flash 600ms ease; }
+  /* tutorial */
+  .veil{ position:absolute; inset:0; background:rgba(8,14,28,.55); z-index:40; display:none; align-items:center; justify-content:center; padding:22px; }
+  .veil.on{ display:flex }
+  .coach{ background:linear-gradient(180deg,#fffbe9,#f3e4c2); border:3px solid var(--brown); border-radius:20px;
+    padding:14px 18px; max-width:300px; text-align:center; color:var(--ink); box-shadow:0 10px 30px rgba(0,0,0,.5); }
+  .coach .hand{ width:46px; height:46px; margin:0 auto 4px; }
+  .coach h4{ margin:4px 0; font-size:17px } .coach p{ margin:0; font-size:13.5px; font-weight:700 }
+  .coach .hint{ margin-top:12px; font-size:11px; font-weight:800; color:#8a6a3a; letter-spacing:.4px; text-transform:uppercase }
+  .screen.tut .tile.glow{ z-index:45; box-shadow:0 0 0 3px #6ef0a0,0 0 16px 6px #6ef0a0cc; }
 
-  /* refuse / block shake */
-  @keyframes shake {
-    0%,100% { transform: translateX(0); }
-    20% { transform: translateX(-4px) rotate(-3deg); }
-    40% { transform: translateX(4px) rotate(3deg); }
-    60% { transform: translateX(-3px) rotate(-2deg); }
-    80% { transform: translateX(3px) rotate(2deg); }
-  }
-  .item.shake { animation: shake 360ms ease; }
+  /* nav */
+  .nav{ position:relative; z-index:2; display:flex; align-items:center; justify-content:space-between; padding:8px 16px 12px;
+    background:linear-gradient(180deg,#b78a5e,#8e6537); border-top:3px solid #5b4022; flex-shrink:0; }
+  .nav .b{ width:50px; height:50px; border-radius:50%; border:3px solid var(--brown); background:linear-gradient(180deg,#fff7e6,#f3e4c2);
+    display:grid; place-items:center; box-shadow:0 4px 0 rgba(0,0,0,.25); }
+  .nav .b svg{ width:24px; height:24px } .nav .b.center{ width:62px; height:62px; margin-top:-18px;
+    background:radial-gradient(circle at 50% 35%,#fff0a8,#ffcd34 60%,#c98a1c) }
 
-  /* Drag ghost */
-  #ghost {
-    position: fixed; left: 0; top: 0;
-    width: 56px; height: 56px;
-    pointer-events: none;
-    z-index: 9999;
-    display: none;
-  }
-  #ghost.is-dragging { display: block; }
+  /* ---------- Side panel ---------- */
+  .panel{ width:380px; max-width:92vw; flex:0 1 auto; display:flex; flex-direction:column; gap:16px; }
+  .panel h1{ font-size:22px; margin:4px 0 2px; color:#fff }
+  .panel .sub{ color:#9fb3c8; font-size:13px; margin:0 }
+  .card{ background:#16233a; border:1px solid #28395a; border-radius:14px; padding:14px 16px; }
+  .card h3{ margin:0 0 10px; font-size:13px; text-transform:uppercase; letter-spacing:.6px; color:#8fb0d8 }
+  .legend{ display:grid; gap:8px }
+  .legend .row{ display:flex; align-items:center; gap:10px; font-size:13px }
+  .sw{ width:30px; height:30px; border-radius:8px; flex:0 0 auto; display:grid; place-items:center; border:2px solid var(--brown);
+    background:linear-gradient(180deg,#fff,#e9edf2); }
+  .sw svg{ width:20px; height:20px } .sw.t-crystal{ background:linear-gradient(180deg,#d6ffe6,#7ce0a2); border-color:#16703a }
+  .sw.t-gem{ background:linear-gradient(180deg,#d6efff,#7cc4f0); border-color:#1a5f9e }
+  .sw.t-container{ background:linear-gradient(180deg,#f6e6cb,#dcc093); border-color:#7a5326 }
+  .sw.t-chest{ background:linear-gradient(180deg,#ffeec0,#f0c878); border-color:#9a6a1e }
+  .sw.t-currency{ background:linear-gradient(180deg,#fbfdff,#dde3ea); border-color:#586876 }
+  .tag{ font-size:11px; font-weight:800; padding:1px 8px; border-radius:999px; margin-left:auto }
+  .tag.ok{ background:#16361f; color:#8af0aa; border:1px solid #2f8a2a }
+  .tag.no{ background:#3a1818; color:#ff9a9a; border:1px solid #b22f2f }
 
-  /* Toast */
-  .toast {
-    position: absolute;
-    left: 50%; bottom: 96px;
-    transform: translateX(-50%) translateY(12px);
-    max-width: 86%;
-    background: rgba(34, 22, 8, 0.94);
-    color: #fff7e6;
-    border: 2px solid #ffd9a8;
-    border-radius: 14px;
-    padding: 9px 16px;
-    font-weight: 800; font-size: 13px;
-    text-align: center;
-    box-shadow: 0 6px 18px rgba(0,0,0,.4);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 160ms ease, transform 160ms ease;
-    z-index: 60;
-  }
-  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-  .toast.refuse { border-color: #ff9a9a; }
-  .toast.block  { border-color: #ffcf7a; }
-  .toast.ok     { border-color: #9af0b4; }
+  .ctrls{ display:grid; gap:13px }
+  .crow{ display:flex; align-items:center; justify-content:space-between; gap:12px }
+  .crow label{ font-size:13px; font-weight:700 } .crow .d{ font-size:11px; color:#7f93ab; margin-top:2px }
+  select{ background:#0e1726; color:#e8e8ee; border:1px solid #34507a; border-radius:8px; padding:5px 8px; font:inherit; font-size:13px; font-weight:700 }
+  .switch{ position:relative; width:50px; height:28px; flex:0 0 auto; border-radius:999px; cursor:pointer;
+    background:#2f8a2a; border:1px solid #1f5c1c; transition:background .14s }
+  .switch::after{ content:''; position:absolute; top:2px; left:24px; width:22px; height:22px; border-radius:50%; background:#fff;
+    transition:left .14s; box-shadow:0 1px 3px rgba(0,0,0,.5) }
+  .switch.off{ background:#4a3a3a; border-color:#6a2a2a } .switch.off::after{ left:2px }
+  .mini{ background:none; border:1px solid #34507a; color:#9fb3c8; border-radius:7px; font-size:11px; padding:3px 9px; cursor:pointer }
+  .code{ font-family:ui-monospace,Menlo,Consolas,monospace; font-size:12px; color:#d6e4f5 }
 
-  /* First-use tutorial coachmark */
-  .tut-veil {
-    position: absolute; inset: 0;
-    background: rgba(8, 14, 28, 0.55);
-    z-index: 40;
-    display: none;
-    align-items: center; justify-content: center;
-    padding: 22px;
-  }
-  .tut-veil.show { display: flex; }
-  .coach {
-    background: linear-gradient(180deg, #fffbe9, #f3e4c2);
-    border: 3px solid var(--brown);
-    border-radius: 20px;
-    padding: 16px 18px;
-    max-width: 300px;
-    text-align: center;
-    color: var(--ink);
-    box-shadow: var(--shadow);
-    animation: pop 200ms cubic-bezier(.2,1.3,.4,1);
-  }
-  @keyframes pop { from { transform: translateY(16px) scale(.96); opacity: 0; } to { transform: none; opacity: 1; } }
-  .coach .hand { font-size: 40px; }
-  .coach h4 { margin: 6px 0 4px; font-size: 17px; }
-  .coach p { margin: 0; font-size: 14px; font-weight: 700; }
-  .coach .hint { margin-top: 12px; font-size: 11px; font-weight: 800; color: #8a6a3a; letter-spacing: .4px; text-transform: uppercase; }
-  /* glow eligible items underneath the veil */
-  .screen.tut .item.tut-glow {
-    z-index: 45;
-    box-shadow: 0 0 0 3px #6ef0a0, 0 0 16px 6px #6ef0a0cc;
-    border-radius: 12px;
-  }
-
-  /* Reset FAB */
-  .reset-fab {
-    position: absolute;
-    right: 14px; top: 14px;
-    z-index: 3;
-    background: rgba(255,255,255,.85);
-    border: 2px solid var(--brown);
-    border-radius: 999px;
-    padding: 4px 10px;
-    font-weight: 800; font-size: 11px;
-    color: var(--ink);
-    cursor: pointer;
-    box-shadow: 0 2px 0 rgba(0,0,0,.2);
-  }
-
-  /* Bottom nav */
-  .nav {
-    position: relative; z-index: 2;
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 10px 18px 14px;
-    background: linear-gradient(180deg, #b78a5e, #8e6537);
-    border-top: 3px solid #5b4022;
-    flex-shrink: 0;
-  }
-  .nav .btn {
-    width: 52px; height: 52px;
-    border-radius: 50%;
-    border: 3px solid var(--brown);
-    background: linear-gradient(180deg, #fff7e6, #f3e4c2);
-    display: grid; place-items: center;
-    box-shadow: 0 4px 0 rgba(0,0,0,.25);
-    position: relative;
-    font-size: 20px; color: var(--ink);
-    cursor: pointer;
-  }
-  .nav .btn.center {
-    width: 66px; height: 66px;
-    background: radial-gradient(circle at 50% 35%, #fff0a8, #ffcd34 60%, #c98a1c);
-    margin-top: -20px;
-  }
-
-  /* ── Side panel ───────────────────────────────────────────── */
-  .panel {
-    width: 380px;
-    max-width: 92vw;
-    flex: 0 1 auto;
-    display: flex; flex-direction: column;
-    gap: 16px;
-  }
-  .panel h1 {
-    font-size: 22px; margin: 4px 0 2px;
-    color: #fff;
-  }
-  .panel .sub { color: #9fb3c8; font-size: 13px; margin: 0 0 4px; }
-  .card {
-    background: #16233a;
-    border: 1px solid #28395a;
-    border-radius: 14px;
-    padding: 14px 16px;
-  }
-  .card h3 {
-    margin: 0 0 10px; font-size: 13px;
-    text-transform: uppercase; letter-spacing: .6px; color: #8fb0d8;
-  }
-  .legend { display: grid; gap: 7px; }
-  .legend .row { display: flex; align-items: center; gap: 10px; font-size: 13px; }
-  .swatch {
-    width: 26px; height: 26px; border-radius: 7px; flex: 0 0 auto;
-    display: grid; place-items: center; font-size: 15px;
-    border: 2px solid #6e4a1f;
-  }
-  .swatch.greenstone { background: #8ed5f0; }
-  .swatch.order { background: linear-gradient(180deg,#fff,#e6e6e6); }
-  .swatch.container { background: radial-gradient(circle at 50% 28%, #fff, #d7b384 60%, #b07e3e); }
-  .swatch.chest { background: radial-gradient(circle at 50% 28%, #ffe9a8, #e8b34a 65%, #b07e1e); }
-  .swatch.currency { background: radial-gradient(circle at 50% 28%, #fff, #d8dde2 60%, #aab2bb); border-color:#586068; }
-  .swatch.gem { background: radial-gradient(circle at 35% 30%, #fff, #6cf 40%, #19c 75%); border-color:#1a5b87; }
-  .tag { font-size: 11px; font-weight: 800; padding: 1px 7px; border-radius: 999px; margin-left: auto; }
-  .tag.ok { background: #16361f; color: #8af0aa; border: 1px solid #2f8a2a; }
-  .tag.no { background: #3a1818; color: #ff9a9a; border: 1px solid #b22f2f; }
-
-  .ctrls { display: grid; gap: 12px; }
-  .ctrl-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-  .ctrl-row label { font-size: 13px; font-weight: 700; }
-  .ctrl-row .desc { font-size: 11px; color: #7f93ab; margin-top: 2px; }
-  select, .switch {
-    font: inherit;
-  }
-  select {
-    background: #0e1726; color: #e8e8ee;
-    border: 1px solid #34507a; border-radius: 8px;
-    padding: 5px 8px; font-size: 13px; font-weight: 700;
-  }
-  .switch {
-    position: relative; width: 50px; height: 28px; flex: 0 0 auto;
-    border-radius: 999px; cursor: pointer;
-    background: #2f8a2a; border: 1px solid #1f5c1c;
-    transition: background 140ms ease;
-  }
-  .switch::after {
-    content: ''; position: absolute; top: 2px; left: 24px;
-    width: 22px; height: 22px; border-radius: 50%;
-    background: #fff; transition: left 140ms ease;
-    box-shadow: 0 1px 3px rgba(0,0,0,.5);
-  }
-  .switch.off { background: #4a3a3a; border-color: #6a2a2a; }
-  .switch.off::after { left: 2px; }
-  .code { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 12px; color: #d6e4f5; }
-
-  /* Analytics log */
-  .log-head { display:flex; align-items:center; justify-content:space-between; margin-bottom: 8px; }
-  .log-clear { background:none; border:1px solid #34507a; color:#9fb3c8; border-radius:7px; font-size:11px; padding:3px 8px; cursor:pointer; }
-  .counts { display:flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
-  .count { background:#0e1726; border:1px solid #28395a; border-radius:8px; padding:6px 10px; font-size:12px; }
-  .count b { font-size:16px; display:block; }
-  .count.ok b { color:#8af0aa; }
-  .count.no b { color:#ff9a9a; }
-  table.evlog { width:100%; border-collapse: collapse; font-family: ui-monospace,"SF Mono",Menlo,Consolas,monospace; font-size: 11px; }
-  table.evlog th { text-align:left; color:#6f86a4; font-weight:700; padding:3px 6px; border-bottom:1px solid #28395a; position: sticky; top: 0; background:#16233a; }
-  table.evlog td { padding:3px 6px; border-bottom:1px solid #1e2c45; white-space: nowrap; }
-  .evlog .o-success { color:#8af0aa; }
-  .evlog .o-refused_wrong_type { color:#ff9a9a; }
-  .evlog .o-blocked_max_tier { color:#ffcf7a; }
-  .log-scroll { max-height: 220px; overflow:auto; border-radius: 8px; }
-  .log-empty { color:#5d7390; font-size:12px; padding:10px 2px; }
-  .parity { font-size:11px; color:#7f93ab; margin-top:10px; line-height:1.5; }
-  .parity code { color:#9fe0b4; }
-  .footnote { color:#5d7390; font-size:11px; }
-  a.prd { color:#7fb0ff; text-decoration: none; }
-  a.prd:hover { text-decoration: underline; }
+  .lh{ display:flex; align-items:center; justify-content:space-between; margin-bottom:8px }
+  .counts{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:10px }
+  .count{ background:#0e1726; border:1px solid #28395a; border-radius:8px; padding:6px 10px; font-size:12px }
+  .count b{ font-size:16px; display:block } .count.ok b{ color:#8af0aa } .count.no b{ color:#ff9a9a }
+  table.ev{ width:100%; border-collapse:collapse; font-family:ui-monospace,Menlo,Consolas,monospace; font-size:11px }
+  table.ev th{ text-align:left; color:#6f86a4; font-weight:700; padding:3px 6px; border-bottom:1px solid #28395a; position:sticky; top:0; background:#16233a }
+  table.ev td{ padding:3px 6px; border-bottom:1px solid #1e2c45; white-space:nowrap }
+  .o-success{ color:#8af0aa } .o-refused_wrong_type{ color:#ff9a9a } .o-blocked_max_tier{ color:#ffcf7a }
+  .scroll{ max-height:200px; overflow:auto; border-radius:8px }
+  .empty{ color:#5d7390; font-size:12px; padding:10px 2px }
+  .parity{ font-size:11px; color:#7f93ab; margin-top:10px; line-height:1.5 } .parity code{ color:#9fe0b4 }
+  .foot{ color:#5d7390; font-size:11px }
 </style>
 </head>
 <body>
-
-  <!-- ── Phone ──────────────────────────────────────────────── -->
-  <div class="phone" aria-label="Mergedom Green Crystal demo">
+  <div class="phone">
     <div class="screen" id="screen">
       <div class="room-bg"></div>
-
-      <button class="reset-fab" id="resetBtn" type="button">↻ Reset</button>
+      <button class="reset" id="reset" type="button">↻ Reset</button>
 
       <div class="hud">
-        <div class="pill energy"><span class="badge"></span>310<span class="plus">+</span></div>
-        <div class="pill coin"><span class="badge"></span>1096<span class="plus">+</span></div>
+        <div class="pill energy"><span class="badge" id="hudEnergy"></span>310<span class="plus">+</span></div>
+        <div class="pill coin"><span class="badge" id="hudCoin"></span>1096<span class="plus">+</span></div>
         <button class="cog" aria-label="Settings">⚙</button>
       </div>
 
-      <div class="avatars">
-        <div class="order">
-          <div class="npc bearded" aria-label="Customer"></div>
-          <div class="order-slot">🧼</div>
-        </div>
-        <div class="order">
-          <div class="npc boy-npc" aria-label="Customer"></div>
-          <div class="order-slot">🍪</div>
-        </div>
+      <div class="orders">
+        <div class="order"><div class="npc">🧔🏻</div><div class="slot" id="ord1"></div></div>
+        <div class="order"><div class="npc boy">👧</div><div class="slot" id="ord2"></div></div>
       </div>
 
-      <div class="banner">
-        <div class="info"><span id="infoText">Drag a Crystal onto a regular order item to upgrade it.</span></div>
-      </div>
+      <div class="banner"><div class="info"><span>Drag a Crystal onto a regular order item to upgrade it.</span></div></div>
 
-      <div class="board-wrap">
-        <div class="board" id="board"></div>
-      </div>
+      <div class="board-wrap"><div class="board" id="board"></div></div>
 
-      <!-- toast -->
       <div class="toast" id="toast"></div>
-
-      <!-- first-use tutorial -->
-      <div class="tut-veil" id="tutVeil">
+      <div class="veil" id="veil">
         <div class="coach">
-          <div class="hand">👆 <span class="xtl"></span></div>
+          <div class="hand" id="coachIcon"></div>
           <h4>Crystal</h4>
           <p>Drag it onto a regular item to upgrade it one tier. It will not work on producers, chests, or currency.</p>
           <div class="hint">Tap anywhere to continue</div>
@@ -588,431 +221,239 @@
       </div>
 
       <div class="nav">
-        <button class="btn" aria-label="Inventory">🎒</button>
-        <button class="btn" aria-label="Shop">🏪</button>
-        <button class="btn center" aria-label="Home">🏠</button>
-        <button class="btn" aria-label="Tasks">📋</button>
-        <button class="btn" aria-label="Book">📖</button>
+        <div class="b">🎒</div><div class="b">🏪</div><div class="b center">🏠</div><div class="b">📋</div><div class="b">📖</div>
       </div>
     </div>
   </div>
 
-  <!-- ── Side panel ─────────────────────────────────────────── -->
   <div class="panel">
     <div>
       <h1>Crystal — Order-Only Merge Booster</h1>
-      <p class="sub">Interactive prototype for the Mergedom PRD. Drag the crystals on the board. Producers, chests, currency, and the blue gem refuse. Order items upgrade.</p>
+      <p class="sub">Interactive prototype for the Mergedom PRD. Drag the crystals on the board. Producers, chests, currency and the blue gem refuse. Order items upgrade.</p>
     </div>
-
     <div class="card">
       <h3>What is on the board</h3>
-      <div class="legend">
-        <div class="row"><span class="swatch greenstone"><span class="xtl"></span></span> <span><b>Crystal</b> — drag me</span><span class="tag ok">grant</span></div>
-        <div class="row"><span class="swatch order">🧼</span> <span><b>Order items</b> — Soap, Tools, Cleaning, Cookies, Toys</span><span class="tag ok">upgrades</span></div>
-        <div class="row"><span class="swatch container">🧺</span> <span><b>Cleaning Set</b> — producer / container</span><span class="tag no">refuses</span></div>
-        <div class="row"><span class="swatch chest">🎁</span> <span><b>Chest</b></span><span class="tag no">refuses</span></div>
-        <div class="row"><span class="swatch currency">🪙</span> <span><b>Coins / Energy</b></span><span class="tag no">refuses</span></div>
-        <div class="row"><span class="swatch gem">💎</span> <span><b>Blue gem</b> — T6 Merge Stone</span><span class="tag no">refuses</span></div>
-      </div>
+      <div class="legend" id="legend"></div>
     </div>
-
     <div class="card">
       <h3>Kinoa config (live)</h3>
       <div class="ctrls">
-        <div class="ctrl-row">
-          <div>
-            <label for="">GreenCrystal.IsWorking</label>
-            <div class="desc">Kill switch. Off = the crystal is inert.</div>
-          </div>
-          <div class="switch" id="killSwitch" role="switch" aria-checked="true" tabindex="0"></div>
-        </div>
-        <div class="ctrl-row">
-          <div>
-            <label for="capSel">MaxTargetTier</label>
-            <div class="desc">Optional cap on the tier it can produce. Default no cap.</div>
-          </div>
-          <select id="capSel">
-            <option value="chain_max" selected>chain_max</option>
-            <option value="7">7</option>
-            <option value="5">5</option>
-          </select>
-        </div>
-        <div class="ctrl-row">
-          <div>
-            <label>First-use tutorial</label>
-            <div class="desc">Fires once on first crystal drag-start.</div>
-          </div>
-          <button class="log-clear" id="replayTut" type="button">Replay</button>
-        </div>
+        <div class="crow"><div><label>GreenCrystal.IsWorking</label><div class="d">Kill switch. Off = the crystal is inert.</div></div>
+          <div class="switch" id="kill" role="switch" aria-checked="true" tabindex="0"></div></div>
+        <div class="crow"><div><label for="cap">MaxTargetTier</label><div class="d">Optional cap on the tier it can produce. Default no cap.</div></div>
+          <select id="cap"><option value="chain_max" selected>chain_max</option><option value="7">7</option><option value="5">5</option></select></div>
+        <div class="crow"><div><label>First-use tutorial</label><div class="d">Fires once on first crystal drag-start.</div></div>
+          <button class="mini" id="replay" type="button">Replay</button></div>
       </div>
     </div>
-
     <div class="card">
-      <div class="log-head">
-        <h3 style="margin:0">booster_used event log</h3>
-        <button class="log-clear" id="logClear" type="button">Clear</button>
-      </div>
+      <div class="lh"><h3 style="margin:0">booster_used event log</h3><button class="mini" id="clearLog" type="button">Clear</button></div>
       <div class="counts">
-        <div class="count ok"><b id="cSuccess">0</b>success</div>
-        <div class="count no"><b id="cRefused">0</b>refused</div>
-        <div class="count no"><b id="cBlocked">0</b>blocked_max</div>
-        <div class="count"><b id="cTotal">0</b>total rows</div>
+        <div class="count ok"><b id="cS">0</b>success</div><div class="count no"><b id="cR">0</b>refused</div>
+        <div class="count no"><b id="cB">0</b>blocked_max</div><div class="count"><b id="cT">0</b>total rows</div>
       </div>
-      <div class="log-scroll">
-        <table class="evlog">
-          <thead>
-            <tr><th>#</th><th>booster</th><th>used_on</th><th>family</th><th>outcome</th><th>consumed</th></tr>
-          </thead>
-          <tbody id="logBody">
-            <tr><td colspan="6" class="log-empty">No events yet. Drag a crystal onto something.</td></tr>
-          </tbody>
-        </table>
-      </div>
+      <div class="scroll"><table class="ev"><thead><tr><th>#</th><th>booster</th><th>used_on</th><th>family</th><th>outcome</th><th>consumed</th></tr></thead>
+        <tbody id="logBody"><tr><td colspan="6" class="empty">No events yet. Drag a crystal onto something.</td></tr></tbody></table></div>
       <p class="parity">Parity caveat — a greenstone row is logged on every drop onto a real item, including refusals and blocks. Real usage is <code>booster='greenstone' AND outcome='success'</code>, never a raw count.</p>
     </div>
-
-    <p class="footnote">Prototype, not final art. A green recolor of the gem stands in for the Green Crystal. PRD: <span class="code">green-crystal.md</span> · <span class="code">green-crystal-notion.md</span></p>
+    <p class="foot">Prototype, not final art. Icons are placeholders. PRD: <span class="code">green-crystal.md</span> · <span class="code">green-crystal-notion.md</span></p>
   </div>
 
   <div id="ghost"></div>
 
 <script>
-/* ─────────────────────────────────────────────────────────────
-   Item model. Order families + tier ceilings from mergedom_items.md
-   (mirrors the balancing spreadsheet). Blocked types per the PRD
-   eligibility predicate.
-   ──────────────────────────────────────────────────────────── */
+/* ---------- Icons (inline SVG, fixed size — no emoji metrics) ---------- */
+function gem(a,b,st,sh){return '<svg viewBox="0 0 48 48"><path d="M24 4 L43 18 L24 45 L5 18 Z" fill="'+a+'" stroke="'+st+'" stroke-width="3" stroke-linejoin="round"/><path d="M16 18 L24 4 L32 18 L24 45 Z" fill="'+b+'"/><path d="M5 18 H43 M16 18 L24 45 M32 18 L24 45" fill="none" stroke="'+st+'" stroke-width="1.4" opacity=".45"/><path d="M10 14 L18 9" stroke="'+sh+'" stroke-width="2.6" stroke-linecap="round" opacity=".9"/></svg>';}
+const ICONS = {
+  crystal: gem('#41c76d','#7ce89e','#176f37','#eafff2'),
+  bluegem: gem('#3aa6ee','#86cdf6','#1a5f9e','#eaf6ff'),
+  soap: '<svg viewBox="0 0 48 48"><rect x="8" y="19" width="32" height="20" rx="7" fill="#6aa6ff" stroke="#37589c" stroke-width="2.5"/><rect x="8" y="19" width="32" height="9" rx="6" fill="#9ec4ff"/><circle cx="33" cy="13" r="5" fill="#cfe2ff" stroke="#37589c" stroke-width="2"/><circle cx="24" cy="9" r="3" fill="#cfe2ff" stroke="#37589c" stroke-width="1.6"/></svg>',
+  hammer: '<svg viewBox="0 0 48 48"><rect x="21.5" y="20" width="5" height="20" rx="2.5" fill="#a9743f" stroke="#5e3f22" stroke-width="2.2"/><path d="M11 13 h26 a3 3 0 0 1 3 3 v4 a3 3 0 0 1 -3 3 h-26 a3 3 0 0 1 -3 -3 v-4 a3 3 0 0 1 3 -3z" fill="#c4ccd6" stroke="#5e6b78" stroke-width="2.5"/><rect x="11" y="13" width="26" height="5" rx="2" fill="#e2e8ef"/></svg>',
+  bottle: '<svg viewBox="0 0 48 48"><rect x="16" y="17" width="17" height="23" rx="5" fill="#56d09b" stroke="#218a62" stroke-width="2.5"/><rect x="20" y="9" width="9" height="9" fill="#56d09b" stroke="#218a62" stroke-width="2.5"/><path d="M29 11 h9 l-4 3.5 h-5z" fill="#8a93a0" stroke="#5a6470" stroke-width="2" stroke-linejoin="round"/><rect x="19" y="23" width="11" height="8" rx="2" fill="#d6fff0"/></svg>',
+  cookie: '<svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="16" fill="#d99a52" stroke="#8a5a26" stroke-width="2.5"/><circle cx="18" cy="19" r="2.6" fill="#5e3a18"/><circle cx="30" cy="18" r="2.2" fill="#5e3a18"/><circle cx="28" cy="29" r="2.6" fill="#5e3a18"/><circle cx="18" cy="30" r="2" fill="#5e3a18"/><circle cx="24" cy="24" r="1.8" fill="#5e3a18"/></svg>',
+  bear: '<svg viewBox="0 0 48 48"><circle cx="14" cy="13" r="6" fill="#c98a4a" stroke="#8a5a26" stroke-width="2.5"/><circle cx="34" cy="13" r="6" fill="#c98a4a" stroke="#8a5a26" stroke-width="2.5"/><circle cx="24" cy="27" r="14" fill="#e0a766" stroke="#8a5a26" stroke-width="2.5"/><circle cx="19" cy="25" r="2.1" fill="#3a2410"/><circle cx="29" cy="25" r="2.1" fill="#3a2410"/><ellipse cx="24" cy="31" rx="5" ry="4" fill="#f3d3a8"/><circle cx="24" cy="30" r="1.7" fill="#3a2410"/></svg>',
+  crate: '<svg viewBox="0 0 48 48"><rect x="8" y="15" width="32" height="25" rx="3" fill="#caa06a" stroke="#7a5326" stroke-width="2.5"/><path d="M8 24 H40 M24 15 V40 M16 15 V40 M32 15 V40" stroke="#7a5326" stroke-width="1.8" opacity=".5"/><rect x="6" y="11" width="36" height="6" rx="2" fill="#9a7544" stroke="#7a5326" stroke-width="2"/></svg>',
+  chest: '<svg viewBox="0 0 48 48"><rect x="8" y="22" width="32" height="16" rx="3" fill="#b9772f" stroke="#6e3f12" stroke-width="2.5"/><path d="M9 23 a15 8 0 0 1 30 0 v-2 a3 3 0 0 0 -3 -3 h-24 a3 3 0 0 0 -3 3 z" fill="#d89a45" stroke="#6e3f12" stroke-width="2.5"/><rect x="21" y="25" width="6" height="8" rx="1.5" fill="#ffd86a" stroke="#6e3f12" stroke-width="2"/></svg>',
+  coin: '<svg viewBox="0 0 48 48"><circle cx="24" cy="24" r="16" fill="#ffcf3f" stroke="#b8841a" stroke-width="2.5"/><circle cx="24" cy="24" r="11" fill="none" stroke="#e0a82a" stroke-width="2"/><path d="M24 16 l2.4 5 5.4 .5 -4 4 1 5.4 -4.8-2.6 -4.8 2.6 1-5.4 -4-4 5.4-.5z" fill="#b8841a"/></svg>',
+  bolt: '<svg viewBox="0 0 48 48"><path d="M27 5 L13 27 H22 L20 43 L35 19 H25 L29 5 Z" fill="#ffd23f" stroke="#c98a1c" stroke-width="2.5" stroke-linejoin="round"/></svg>',
+  hand: '<svg viewBox="0 0 48 48"><path d="M22 6 a3 3 0 0 1 6 0 v14 l3-2 a3 3 0 0 1 5 2 l-2 12 a8 8 0 0 1 -8 7 h-3 a8 8 0 0 1 -7-5 l-5-9 a3 3 0 0 1 5-3 l3 4 V6z" fill="#ffd9a8" stroke="#8a5a26" stroke-width="2.5" stroke-linejoin="round"/></svg>'
+};
+
+/* ---------- Item model ---------- */
 const FAMILIES = {
-  soap:   { name: 'Soap',           idp: '12', glyph: '🧼', maxTier: 5  },
-  clean:  { name: 'Cleaning Tools', idp: '11', glyph: '🧴', maxTier: 12 },
-  tool:   { name: 'Tools',          idp: '31', glyph: '🔧', maxTier: 11 },
-  cookie: { name: 'Cookies',        idp: '24', glyph: '🍪', maxTier: 5  },
-  toy:    { name: 'Toy Animals',    idp: '41', glyph: '🧸', maxTier: 9  }
+  soap:  { name:'Soap',           idp:'12', icon:'soap',   maxTier:5  },
+  clean: { name:'Cleaning Tools', idp:'11', icon:'bottle', maxTier:12 },
+  tool:  { name:'Tools',          idp:'31', icon:'hammer', maxTier:11 },
+  cookie:{ name:'Cookies',        idp:'24', icon:'cookie', maxTier:5  },
+  toy:   { name:'Toy Animals',    idp:'41', icon:'bear',   maxTier:9  }
 };
-
-/* Blocked pieces are clean glyph tiles (like the previous demos). Only the
-   blue gem carries a small contained label, for contrast with the Crystal. */
 const BLOCKED = {
-  cleanset: { kind: 'container', id: '10_04', glyph: '🧺', name: 'Cleaning Set' },
-  chest:    { kind: 'chest',     id: '62_01', glyph: '🎁', name: 'Safe Box' },
-  coin:     { kind: 'currency',  id: '5_03',  glyph: '🪙', name: 'Coins' },
-  energy:   { kind: 'currency',  id: '4_02',  glyph: '⚡', name: 'Energy' },
-  gem:      { kind: 'gem',       id: '201_06',glyph: '💎', lbl: 'T6', name: 'Merge Stone' }
+  cleanset:{ kind:'container', id:'10_04', icon:'crate', name:'Cleaning Set' },
+  chest:   { kind:'chest',     id:'62_01', icon:'chest', name:'Safe Box' },
+  coin:    { kind:'currency',  id:'5_03',  icon:'coin',  name:'Coins' },
+  energy:  { kind:'currency',  id:'4_02',  icon:'bolt',  name:'Energy' },
+  gem:     { kind:'gem',       id:'201_06',icon:'bluegem', lbl:'T6', name:'Merge Stone' }
 };
-
-/* Initial board. 7 cols × 9 rows, indices 0–62.  GC = Green Crystal */
 const INITIAL = {
-  8:  { kind: 'gc' },
-  10: { kind: 'order', f: 'soap',   t: 2 },
-  12: { kind: 'order', f: 'tool',   t: 4 },
-  15: { kind: 'order', f: 'soap',   t: 1 },
-  16: { kind: 'order', f: 'soap',   t: 1 },     // merge pair → Soap T2
-  18: { kind: 'order', f: 'cookie', t: 3 },
-  22: { kind: 'gc' },
-  24: { kind: 'order', f: 'clean',  t: 5 },
-  26: { kind: 'order', f: 'toy',    t: 4 },
-  30: { kind: 'blocked', b: 'cleanset' },
-  32: { kind: 'blocked', b: 'chest' },
-  36: { kind: 'gc' },
-  38: { kind: 'order', f: 'soap',   t: 5 },      // MAX (Soap max = 5)
-  40: { kind: 'order', f: 'cookie', t: 5 },      // MAX (Cookies max = 5)
-  43: { kind: 'blocked', b: 'coin' },
-  45: { kind: 'blocked', b: 'energy' },
-  47: { kind: 'blocked', b: 'gem' },
-  50: { kind: 'gc' }
+  8:{k:'gc'}, 10:{k:'order',f:'soap',t:2}, 12:{k:'order',f:'tool',t:4},
+  15:{k:'order',f:'soap',t:1}, 16:{k:'order',f:'soap',t:1}, 18:{k:'order',f:'cookie',t:3},
+  22:{k:'gc'}, 24:{k:'order',f:'clean',t:5}, 26:{k:'order',f:'toy',t:4},
+  30:{k:'blocked',b:'cleanset'}, 32:{k:'blocked',b:'chest'},
+  36:{k:'gc'}, 38:{k:'order',f:'soap',t:5}, 40:{k:'order',f:'cookie',t:5},
+  43:{k:'blocked',b:'coin'}, 45:{k:'blocked',b:'energy'}, 47:{k:'blocked',b:'gem'}, 50:{k:'gc'}
 };
-
 const CELLS = 63;
 
-const board   = document.getElementById('board');
-const ghost   = document.getElementById('ghost');
-const toastEl = document.getElementById('toast');
-const screenEl = document.getElementById('screen');
-const tutVeil = document.getElementById('tutVeil');
+const board=document.getElementById('board'), ghost=document.getElementById('ghost'),
+  toastEl=document.getElementById('toast'), screenEl=document.getElementById('screen'), veil=document.getElementById('veil');
+let cfg={ isWorking:true, cap:Infinity }, tutSeen=false, tutOpen=false;
 
-/* config state (simulated Kinoa) */
-let cfg = { isWorking: true, maxTargetTier: Infinity };
-let tutSeen = false;
-let tutOpen = false;
+const pad2=n=>String(n).padStart(2,'0');
+const usedOn=(f,t)=>FAMILIES[f].idp+'_'+pad2(t);
 
-function pad2(n){ return String(n).padStart(2, '0'); }
-function usedOnOrder(f, t){ return FAMILIES[f].idp + '_' + pad2(t); }
-
-/* ── Build board ─────────────────────────────────────────── */
-let cells = [];
-function buildBoard() {
-  board.innerHTML = '';
-  cells = [];
-  for (let i = 0; i < CELLS; i++) {
-    const c = document.createElement('div');
-    c.className = 'cell';
-    c.dataset.idx = i;
-    if (INITIAL[i]) c.appendChild(makePiece(INITIAL[i]));
-    board.appendChild(c);
-    cells.push(c);
-  }
-  refreshGcCount();
-}
-function makePiece(data) {
-  const el = document.createElement('div');
-  el.dataset.kind = data.kind;
-  if (data.kind === 'gc') {
-    el.className = 'item greenstone';
-    el.innerHTML = '<span class="xtl"></span><span class="lbl">Crystal</span>';
-  } else if (data.kind === 'blocked') {
-    const b = BLOCKED[data.b];
-    el.className = 'item ' + b.kind;
-    el.dataset.block = data.b;
-    el.dataset.id = b.id;
-    el.innerHTML = '<span class="glyph">' + b.glyph + '</span>' + (b.lbl ? '<span class="lbl">' + b.lbl + '</span>' : '');
-  } else { // order
-    const fam = FAMILIES[data.f];
-    el.className = 'item order' + (data.t >= fam.maxTier ? ' maxed' : '');
-    el.dataset.family = data.f;
-    el.dataset.tier = String(data.t);
-    el.innerHTML = '<span class="glyph">' + fam.glyph + '</span><span class="lbl' + (data.t >= fam.maxTier ? ' max' : '') + '">Lv ' + data.t + '</span>';
-  }
+/* ---------- Build ---------- */
+function makePiece(d){
+  const el=document.createElement('div'); el.className='tile'; el.dataset.kind=d.k;
+  let icon,lbl='';
+  if(d.k==='gc'){ el.classList.add('t-crystal'); icon='crystal'; lbl='Crystal'; }
+  else if(d.k==='blocked'){ const b=BLOCKED[d.b]; el.classList.add('t-'+b.kind); el.dataset.block=d.b; el.dataset.id=b.id; icon=b.icon; lbl=b.lbl||''; }
+  else { const f=FAMILIES[d.f]; el.classList.add('t-order'); el.dataset.family=d.f; el.dataset.tier=d.t; icon=f.icon; lbl='Lv '+d.t; if(d.t>=f.maxTier) el.classList.add('maxed'); }
+  el.innerHTML='<div class="ic">'+ICONS[icon]+'</div>'+(lbl?'<div class="lbl'+(el.classList.contains('maxed')?' max':'')+'">'+lbl+'</div>':'');
   return el;
 }
-function refreshGcCount() {
-  const el = document.getElementById('gcCount');
-  if (el) el.textContent = board.querySelectorAll('.item.greenstone').length;
-}
+function build(){ board.innerHTML=''; for(let i=0;i<CELLS;i++){ const c=document.createElement('div'); c.className='cell'; c.dataset.idx=i; if(INITIAL[i]) c.appendChild(makePiece(INITIAL[i])); board.appendChild(c);} }
 
-/* ── Classify a Green Crystal drop ───────────────────────── */
-function classifyGc(targetCell) {
-  if (!targetCell) return { kind: 'snap' };                 // off-board
-  const tEl = targetCell.querySelector('.item');
-  if (!tEl) return { kind: 'move' };                        // empty cell
-  const k = tEl.dataset.kind;
-  if (k === 'order') {
-    const fam = FAMILIES[tEl.dataset.family];
-    const t = parseInt(tEl.dataset.tier, 10);
-    const usedOn = usedOnOrder(tEl.dataset.family, t);
-    if (t >= fam.maxTier)          return { kind: 'block', tEl, usedOn, family: fam.idp, reason: 'chain' };
-    if (t + 1 > cfg.maxTargetTier) return { kind: 'block', tEl, usedOn, family: fam.idp, reason: 'cap' };
-    return { kind: 'upgrade', tEl, usedOn, family: fam.idp, f: tEl.dataset.family, t };
+/* ---------- Classify ---------- */
+function classifyGc(cell){
+  if(!cell) return {k:'snap'};
+  const t=cell.querySelector('.tile'); if(!t) return {k:'move'};
+  if(t.dataset.kind==='order'){
+    const fam=FAMILIES[t.dataset.family], tier=+t.dataset.tier, uo=usedOn(t.dataset.family,tier);
+    if(tier>=fam.maxTier) return {k:'block',t,uo,fam:fam.idp,why:'chain'};
+    if(tier+1>cfg.cap)    return {k:'block',t,uo,fam:fam.idp,why:'cap'};
+    return {k:'up',t,uo,fam:fam.idp,f:t.dataset.family,tier};
   }
-  // any non-order item = refuse
-  const id = tEl.dataset.id || (k === 'gc' ? 'greenstone' : '');
-  const family = id.includes('_') ? id.split('_')[0] : 'greenstone';
-  return { kind: 'refuse', tEl, usedOn: id || 'greenstone', family };
+  const id=t.dataset.id||'greenstone', fam=id.includes('_')?id.split('_')[0]:'greenstone';
+  return {k:'refuse',t,uo:id,fam};
 }
-
-/* Classify a normal order-item drop (same-tier merge) */
-function classifyOrder(srcEl, targetCell) {
-  if (!targetCell) return 'snap';
-  const tEl = targetCell.querySelector('.item');
-  if (!tEl) return 'move';
-  if (tEl === srcEl) return 'snap';
-  if (tEl.dataset.kind === 'order'
-      && tEl.dataset.family === srcEl.dataset.family
-      && tEl.dataset.tier === srcEl.dataset.tier) {
-    const fam = FAMILIES[srcEl.dataset.family];
-    if (parseInt(srcEl.dataset.tier, 10) < fam.maxTier) return 'merge';
+function classifyOrder(src,cell){
+  if(!cell) return 'snap'; const t=cell.querySelector('.tile'); if(!t) return 'move'; if(t===src) return 'snap';
+  if(t.dataset.kind==='order'&&t.dataset.family===src.dataset.family&&t.dataset.tier===src.dataset.tier){
+    if(+src.dataset.tier<FAMILIES[src.dataset.family].maxTier) return 'merge';
   }
   return 'bad';
 }
 
-/* ── Drag and drop ───────────────────────────────────────── */
-let drag = null, lastHover = null;
-function setGhost(x, y){ ghost.style.transform = 'translate(' + (x-28) + 'px,' + (y-28) + 'px) scale(1.1)'; }
-function clearHover(){ if (lastHover) lastHover.classList.remove('drop-ok','drop-merge','drop-upgrade','drop-block','drop-bad'); lastHover = null; }
+/* ---------- Drag ---------- */
+let drag=null, hover=null;
+const setGhost=(x,y)=>ghost.style.transform='translate('+(x-25)+'px,'+(y-25)+'px) scale(1.1)';
+const clearHover=()=>{ if(hover) hover.classList.remove('ok','merge','up','block','bad'); hover=null; };
 
-document.addEventListener('pointerdown', (e) => {
-  // tutorial is open → any tap closes it
-  if (tutOpen) { closeTut(); return; }
-  const target = e.target.closest('.item');
-  if (!target) return;
-
-  // first crystal drag-start → fire one-time tutorial, do not start the drag
-  if (target.dataset.kind === 'gc' && cfg.isWorking && !tutSeen) {
-    e.preventDefault();
-    openTut();
-    return;
-  }
-
+document.addEventListener('pointerdown',e=>{
+  if(tutOpen){ closeTut(); return; }
+  const t=e.target.closest('.tile'); if(!t) return;
+  if(t.dataset.kind==='gc'&&cfg.isWorking&&!tutSeen){ e.preventDefault(); openTut(); return; }
   e.preventDefault();
-  drag = { source: target, isGc: target.dataset.kind === 'gc' };
-  const gi = target.cloneNode(true);
-  gi.style.width = '100%'; gi.style.height = '100%';
-  ghost.innerHTML = ''; ghost.appendChild(gi);
-  ghost.classList.add('is-dragging');
-  setGhost(e.clientX, e.clientY);
-  target.classList.add('dragging');
+  drag={src:t,isGc:t.dataset.kind==='gc'};
+  const g=t.cloneNode(true); g.style.width='100%'; g.style.height='100%';
+  ghost.innerHTML=''; ghost.appendChild(g); ghost.classList.add('on'); setGhost(e.clientX,e.clientY); t.classList.add('dragging');
 });
-
-document.addEventListener('pointermove', (e) => {
-  if (!drag) return;
-  setGhost(e.clientX, e.clientY);
-  const el = document.elementFromPoint(e.clientX, e.clientY);
-  const cell = el && el.closest && el.closest('.cell');
-  if (cell !== lastHover) {
-    clearHover();
-    if (cell) {
-      lastHover = cell;
-      if (drag.isGc) {
-        const r = classifyGc(cell);
-        if (r.kind === 'move')    cell.classList.add('drop-ok');
-        if (r.kind === 'upgrade') cell.classList.add('drop-upgrade');
-        if (r.kind === 'block')   cell.classList.add('drop-block');
-        if (r.kind === 'refuse')  cell.classList.add('drop-bad');
-      } else {
-        const k = classifyOrder(drag.source, cell);
-        if (k === 'move')  cell.classList.add('drop-ok');
-        if (k === 'merge') cell.classList.add('drop-merge');
-        if (k === 'bad')   cell.classList.add('drop-bad');
-      }
-    }
-  }
+document.addEventListener('pointermove',e=>{
+  if(!drag) return; setGhost(e.clientX,e.clientY);
+  const el=document.elementFromPoint(e.clientX,e.clientY), cell=el&&el.closest&&el.closest('.cell');
+  if(cell!==hover){ clearHover(); if(cell){ hover=cell;
+    if(drag.isGc){ const r=classifyGc(cell); cell.classList.add(r.k==='up'?'up':r.k==='block'?'block':r.k==='refuse'?'bad':r.k==='move'?'ok':''); }
+    else { const k=classifyOrder(drag.src,cell); if(k==='move')cell.classList.add('ok'); if(k==='merge')cell.classList.add('merge'); if(k==='bad')cell.classList.add('bad'); }
+  }}
 });
-
-document.addEventListener('pointerup', (e) => {
-  if (!drag) return;
-  ghost.classList.remove('is-dragging'); ghost.innerHTML = '';
-  const el = document.elementFromPoint(e.clientX, e.clientY);
-  const cell = el && el.closest && el.closest('.cell');
-  const src = drag.source, isGc = drag.isGc;
-  src.classList.remove('dragging');
-  clearHover();
-  drag = null;
-
-  if (isGc) handleGcDrop(src, cell);
-  else handleOrderDrop(src, cell);
+document.addEventListener('pointerup',e=>{
+  if(!drag) return; ghost.classList.remove('on'); ghost.innerHTML='';
+  const el=document.elementFromPoint(e.clientX,e.clientY), cell=el&&el.closest&&el.closest('.cell');
+  const src=drag.src, isGc=drag.isGc; src.classList.remove('dragging'); clearHover(); drag=null;
+  isGc?handleGc(src,cell):handleOrder(src,cell);
 });
+document.addEventListener('pointercancel',()=>{ if(!drag)return; ghost.classList.remove('on'); ghost.innerHTML=''; drag.src.classList.remove('dragging'); clearHover(); drag=null; });
 
-document.addEventListener('pointercancel', () => {
-  if (!drag) return;
-  ghost.classList.remove('is-dragging'); ghost.innerHTML = '';
-  drag.source.classList.remove('dragging'); clearHover(); drag = null;
-});
-
-function handleGcDrop(src, cell) {
-  // kill switch off → inert
-  if (!cfg.isWorking) {
-    toast('GreenCrystal.IsWorking = false · crystal is inert', 'block');
-    return;
-  }
-  const r = classifyGc(cell);
-  if (r.kind === 'move') { cell.appendChild(src); return; }
-  if (r.kind === 'snap') return;                       // off-board, silent, no event
-
-  if (r.kind === 'upgrade') {
-    const newT = r.t + 1;
-    r.tEl.remove(); src.remove();
-    const up = makePiece({ kind: 'order', f: r.f, t: newT });
-    cell.appendChild(up);
-    up.classList.add('upgrading');
-    setTimeout(() => up.classList.remove('upgrading'), 650);
-    refreshGcCount();
-    logEvent({ usedOn: usedOnOrder(r.f, newT), family: r.family, outcome: 'success', consumed: true });
-    toast('Upgraded to ' + FAMILIES[r.f].name + ' Lv ' + newT, 'ok');
-    if (tutOpen) closeTut();
-  } else if (r.kind === 'block') {
-    shake(r.tEl);
-    const msg = r.reason === 'cap'
-      ? "The Green Crystal can't upgrade this item any further."
-      : 'This item is already at max tier.';
-    toast(msg, 'block');
-    logEvent({ usedOn: r.usedOn, family: r.family, outcome: 'blocked_max_tier', consumed: false });
-  } else if (r.kind === 'refuse') {
-    shake(r.tEl);
-    toast('Green Crystal only works on regular items.', 'refuse');
-    logEvent({ usedOn: r.usedOn, family: r.family, outcome: 'refused_wrong_type', consumed: false });
+function handleGc(src,cell){
+  if(!cfg.isWorking){ toast('GreenCrystal.IsWorking = false · crystal is inert','block'); return; }
+  const r=classifyGc(cell);
+  if(r.k==='move'){ cell.appendChild(src); return; }
+  if(r.k==='snap') return;
+  if(r.k==='up'){
+    const nt=r.tier+1; r.t.remove(); src.remove();
+    const up=makePiece({k:'order',f:r.f,t:nt}); cell.appendChild(up); up.classList.add('flash'); setTimeout(()=>up.classList.remove('flash'),650);
+    log({uo:usedOn(r.f,nt),fam:r.fam,outcome:'success',consumed:true});
+    toast('Upgraded to '+FAMILIES[r.f].name+' Lv '+nt,'ok'); if(tutOpen) closeTut();
+  } else if(r.k==='block'){
+    shake(r.t); toast(r.why==='cap'?"The Crystal can't upgrade this item any further.":'This item is already at max tier.','block');
+    log({uo:r.uo,fam:r.fam,outcome:'blocked_max_tier',consumed:false});
+  } else if(r.k==='refuse'){
+    shake(r.t); toast('Crystal only works on regular items.','refuse');
+    log({uo:r.uo,fam:r.fam,outcome:'refused_wrong_type',consumed:false});
   }
 }
+function handleOrder(src,cell){
+  const k=classifyOrder(src,cell);
+  if(k==='move'){ cell.appendChild(src); return; }
+  if(k==='merge'){ const f=src.dataset.family, nt=+src.dataset.tier+1; cell.querySelector('.tile').remove(); src.remove();
+    const up=makePiece({k:'order',f,t:nt}); cell.appendChild(up); up.classList.add('flash'); setTimeout(()=>up.classList.remove('flash'),650); }
+}
+const shake=el=>{ el.classList.add('shake'); setTimeout(()=>el.classList.remove('shake'),360); };
 
-function handleOrderDrop(src, cell) {
-  const k = classifyOrder(src, cell);
-  if (k === 'move') { cell.appendChild(src); return; }
-  if (k === 'merge') {
-    const f = src.dataset.family;
-    const newT = parseInt(src.dataset.tier, 10) + 1;
-    cell.querySelector('.item').remove(); src.remove();
-    const up = makePiece({ kind: 'order', f, t: newT });
-    cell.appendChild(up);
-    up.classList.add('upgrading');
-    setTimeout(() => up.classList.remove('upgrading'), 650);
-  }
-  // 'bad' / 'snap' → silent snap back
+/* ---------- Toast ---------- */
+let tT=null;
+function toast(m,type){ toastEl.textContent=m; toastEl.className='toast show'+(type?' '+type:''); clearTimeout(tT); tT=setTimeout(()=>toastEl.className='toast',1700); }
+
+/* ---------- Tutorial ---------- */
+function openTut(){ tutOpen=true; screenEl.classList.add('tut');
+  board.querySelectorAll('.tile.t-order').forEach(el=>{ if(+el.dataset.tier<FAMILIES[el.dataset.family].maxTier) el.classList.add('glow'); });
+  veil.classList.add('on'); }
+function closeTut(){ tutOpen=false; tutSeen=true; screenEl.classList.remove('tut');
+  board.querySelectorAll('.glow').forEach(el=>el.classList.remove('glow')); veil.classList.remove('on'); }
+
+/* ---------- Analytics ---------- */
+let seq=0,nS=0,nR=0,nB=0; const logBody=document.getElementById('logBody');
+function log({uo,fam,outcome,consumed}){
+  seq++; if(outcome==='success')nS++; else if(outcome==='refused_wrong_type')nR++; else nB++;
+  if(seq===1) logBody.innerHTML='';
+  const tr=document.createElement('tr');
+  tr.innerHTML='<td>'+seq+'</td><td>greenstone</td><td>'+uo+'</td><td>'+fam+'</td><td class="o-'+outcome+'">'+outcome+'</td><td>'+consumed+'</td>';
+  logBody.insertBefore(tr,logBody.firstChild);
+  cS.textContent=nS; cR.textContent=nR; cB.textContent=nB; cT.textContent=seq;
+}
+function clearLog(){ seq=nS=nR=nB=0; logBody.innerHTML='<tr><td colspan="6" class="empty">No events yet. Drag a crystal onto something.</td></tr>'; cS.textContent=cR.textContent=cB.textContent=cT.textContent='0'; }
+
+/* ---------- Controls ---------- */
+const kill=document.getElementById('kill');
+function setKill(on){ cfg.isWorking=on; kill.classList.toggle('off',!on); kill.setAttribute('aria-checked',String(on)); }
+kill.addEventListener('click',()=>setKill(!cfg.isWorking));
+kill.addEventListener('keydown',e=>{ if(e.key===' '||e.key==='Enter'){ e.preventDefault(); setKill(!cfg.isWorking); } });
+document.getElementById('cap').addEventListener('change',e=>cfg.cap=e.target.value==='chain_max'?Infinity:+e.target.value);
+document.getElementById('replay').addEventListener('click',()=>{ tutSeen=false; toast('Tutorial will fire on next crystal drag-start','block'); });
+document.getElementById('clearLog').addEventListener('click',clearLog);
+document.getElementById('reset').addEventListener('click',()=>{ build(); clearLog(); });
+
+/* ---------- Static icons ---------- */
+function fillStatic(){
+  document.getElementById('hudEnergy').innerHTML=ICONS.bolt;
+  document.getElementById('hudCoin').innerHTML=ICONS.coin;
+  document.getElementById('ord1').innerHTML=ICONS.soap;
+  document.getElementById('ord2').innerHTML=ICONS.cookie;
+  document.getElementById('coachIcon').innerHTML=ICONS.crystal;
+  const L=document.getElementById('legend');
+  const rows=[
+    ['t-crystal','crystal','<b>Crystal</b> — drag me','ok','grant'],
+    ['t-order','soap','<b>Order items</b> — Soap, Tools, Cleaning, Cookies, Toys','ok','upgrades'],
+    ['t-container','crate','<b>Cleaning Set</b> — producer / container','no','refuses'],
+    ['t-chest','chest','<b>Chest</b>','no','refuses'],
+    ['t-currency','coin','<b>Coins / Energy</b>','no','refuses'],
+    ['t-gem','bluegem','<b>Blue gem</b> — T6 Merge Stone','no','refuses']
+  ];
+  L.innerHTML=rows.map(r=>'<div class="row"><span class="sw '+r[0]+'">'+ICONS[r[1]]+'</span><span>'+r[2]+'</span><span class="tag '+r[3]+'">'+r[4]+'</span></div>').join('');
 }
 
-function shake(el){ el.classList.add('shake'); setTimeout(() => el.classList.remove('shake'), 380); }
-
-/* ── Toast ───────────────────────────────────────────────── */
-let toastTimer = null;
-function toast(msg, type) {
-  toastEl.textContent = msg;
-  toastEl.className = 'toast show' + (type ? ' ' + type : '');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { toastEl.className = 'toast'; }, 1700);
-}
-
-/* ── First-use tutorial ──────────────────────────────────── */
-function openTut() {
-  tutOpen = true;
-  screenEl.classList.add('tut');
-  board.querySelectorAll('.item.order').forEach(el => {
-    const fam = FAMILIES[el.dataset.family];
-    if (parseInt(el.dataset.tier, 10) < fam.maxTier) el.classList.add('tut-glow');
-  });
-  tutVeil.classList.add('show');
-}
-function closeTut() {
-  tutOpen = false; tutSeen = true;
-  screenEl.classList.remove('tut');
-  board.querySelectorAll('.tut-glow').forEach(el => el.classList.remove('tut-glow'));
-  tutVeil.classList.remove('show');
-}
-
-/* ── Analytics log ───────────────────────────────────────── */
-let seq = 0, nSuccess = 0, nRefused = 0, nBlocked = 0;
-const logBody = document.getElementById('logBody');
-function logEvent({ usedOn, family, outcome, consumed }) {
-  seq++;
-  if (outcome === 'success') nSuccess++;
-  else if (outcome === 'refused_wrong_type') nRefused++;
-  else if (outcome === 'blocked_max_tier') nBlocked++;
-  if (seq === 1) logBody.innerHTML = '';
-  const tr = document.createElement('tr');
-  tr.innerHTML =
-    '<td>' + seq + '</td>' +
-    '<td>greenstone</td>' +
-    '<td>' + usedOn + '</td>' +
-    '<td>' + family + '</td>' +
-    '<td class="o-' + outcome + '">' + outcome + '</td>' +
-    '<td>' + consumed + '</td>';
-  logBody.insertBefore(tr, logBody.firstChild);
-  document.getElementById('cSuccess').textContent = nSuccess;
-  document.getElementById('cRefused').textContent = nRefused;
-  document.getElementById('cBlocked').textContent = nBlocked;
-  document.getElementById('cTotal').textContent = seq;
-}
-function clearLog() {
-  seq = nSuccess = nRefused = nBlocked = 0;
-  logBody.innerHTML = '<tr><td colspan="6" class="log-empty">No events yet. Drag a crystal onto something.</td></tr>';
-  ['cSuccess','cRefused','cBlocked','cTotal'].forEach(id => document.getElementById(id).textContent = '0');
-}
-
-/* ── Controls ────────────────────────────────────────────── */
-const killSwitch = document.getElementById('killSwitch');
-function setKill(on) {
-  cfg.isWorking = on;
-  killSwitch.classList.toggle('off', !on);
-  killSwitch.setAttribute('aria-checked', String(on));
-}
-killSwitch.addEventListener('click', () => setKill(!cfg.isWorking));
-killSwitch.addEventListener('keydown', (e) => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); setKill(!cfg.isWorking); } });
-
-document.getElementById('capSel').addEventListener('change', (e) => {
-  cfg.maxTargetTier = e.target.value === 'chain_max' ? Infinity : parseInt(e.target.value, 10);
-});
-document.getElementById('replayTut').addEventListener('click', () => { tutSeen = false; toast('Tutorial will fire on next crystal drag-start', 'block'); });
-document.getElementById('logClear').addEventListener('click', clearLog);
-document.getElementById('resetBtn').addEventListener('click', () => { buildBoard(); clearLog(); });
-
-/* ── Init ────────────────────────────────────────────────── */
-buildBoard();
+/* ---------- Init ---------- */
+fillStatic(); build();
 </script>
 </body>
 </html>
