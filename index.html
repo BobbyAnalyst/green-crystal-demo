@@ -1,0 +1,1003 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Mergedom — Green Crystal Demo</title>
+<style>
+  :root {
+    --phone-w: 414px;
+    --phone-h: 896px;
+    --peach: #f3e4c2;
+    --brown: #6e4a1f;
+    --brown-d: #4a2a0a;
+    --ink: #2a1d0f;
+    --board-a: #6cc6f0;
+    --board-b: #4ea7d2;
+    --cell:   #8ed5f0;
+    --cell-line: #6fb8d6;
+    --green: #4cb944;
+    --green-d: #2f8a2a;
+    --red: #e64545;
+    --red-d: #b22f2f;
+    --amber: #e0941a;
+    --amber-d: #a86c0e;
+    --gold: #f4c33b;
+    --shadow: 0 8px 0 rgba(0,0,0,0.18), 0 14px 30px rgba(0,0,0,0.35);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    min-height: 100vh;
+    background: radial-gradient(1200px 600px at 20% 0%, #1d2a44 0%, #0e1726 60%) fixed, #0e1726;
+    color: #e8e8ee;
+    font: 14px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 26px;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 32px 16px 60px;
+  }
+
+  /* ── Phone frame ──────────────────────────────────────────── */
+  .phone {
+    width: var(--phone-w);
+    height: var(--phone-h);
+    border-radius: 44px;
+    background: #111;
+    padding: 12px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.6), 0 0 0 2px #1a1a1a inset;
+    position: relative;
+    flex: 0 0 auto;
+  }
+  .screen {
+    position: relative;
+    width: 100%; height: 100%;
+    border-radius: 32px;
+    overflow: hidden;
+    background: linear-gradient(180deg, #cfdfe8 0%, #c1d3df 6%, #bfd1de 12%, #aac3d3 12.1%);
+    display: flex;
+    flex-direction: column;
+  }
+  .room-bg {
+    position: absolute;
+    left: 0; right: 0; top: 0; height: 30%;
+    background: radial-gradient(120% 70% at 50% 100%, #bfd6e1 0%, #aac3d3 70%, #92b0c2 100%);
+    z-index: 0;
+  }
+
+  /* HUD */
+  .hud {
+    position: relative; z-index: 2;
+    padding: 14px 12px 4px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr auto;
+    gap: 6px;
+    align-items: center;
+  }
+  .pill {
+    background: #fff7e6;
+    border: 2.5px solid var(--brown);
+    border-radius: 999px;
+    padding: 3px 10px 3px 28px;
+    font-weight: 800;
+    font-size: 14px;
+    color: var(--ink);
+    position: relative;
+    box-shadow: 0 2px 0 rgba(0,0,0,.18);
+    text-align: center;
+  }
+  .pill .badge {
+    position: absolute;
+    left: -6px; top: 50%;
+    transform: translateY(-50%);
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    border: 2.5px solid var(--brown);
+    display: grid; place-items: center;
+    font-size: 16px;
+    box-shadow: 0 2px 0 rgba(0,0,0,.2);
+  }
+  .pill .plus {
+    position: absolute;
+    right: -8px; top: 50%;
+    transform: translateY(-50%);
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: linear-gradient(180deg, #6ed664, var(--green));
+    border: 2px solid var(--green-d);
+    color: #fff; font-weight: 900; font-size: 16px;
+    display: grid; place-items: center;
+    box-shadow: 0 2px 0 rgba(0,0,0,.2);
+    line-height: 0;
+  }
+  .pill.energy .badge { background: linear-gradient(180deg, #b4e0ff, #5fb3ff); color: #fff; }
+  .pill.energy .badge::before { content: '⚡'; filter: drop-shadow(0 1px 0 #0006); }
+  .pill.greenstone .badge { background: radial-gradient(circle at 35% 30%, #eafff0, #57e08a 55%, #1f9d52); color: #fff; }
+  .pill.greenstone .badge::before { content: '💎'; filter: hue-rotate(85deg) saturate(1.5); font-size: 14px; }
+  .pill.coin   .badge { background: linear-gradient(180deg, #fff0a8, #ffcd34); color: #6a4a00; }
+  .pill.coin   .badge::before { content: '🪙'; font-size: 14px; }
+  .pill.energy { padding-right: 22px; }
+  .pill.greenstone { padding-right: 10px; }
+  .pill.coin  { padding-right: 22px; }
+
+  .cog {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: linear-gradient(180deg, #c8d8e6, #93afc2);
+    border: 2.5px solid #4f6d80;
+    color: #fff;
+    display: grid; place-items: center;
+    font-size: 18px;
+    box-shadow: 0 3px 0 rgba(0,0,0,.25);
+    cursor: pointer;
+  }
+
+  /* Orders */
+  .avatars {
+    position: relative; z-index: 2;
+    margin: 8px 10px 0;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    gap: 14px;
+  }
+  .order {
+    position: relative;
+    background: linear-gradient(180deg, #fffbe9, #f3e4c2);
+    border: 2.5px solid var(--brown);
+    border-radius: 18px;
+    padding: 6px 10px 6px 64px;
+    height: 70px;
+    box-shadow: 0 3px 0 rgba(0,0,0,.2);
+    display: flex; align-items: center; gap: 8px;
+    overflow: visible;
+  }
+  .npc {
+    position: absolute; left: -8px; top: 50%;
+    transform: translateY(-50%);
+    width: 64px; height: 72px;
+    background: linear-gradient(180deg, #bfd6e1, #8aabc1);
+    border: 2.5px solid #355a6f;
+    border-radius: 50% 50% 18px 18px / 60% 60% 18px 18px;
+    display: grid; place-items: end center;
+    font-size: 36px; line-height: 1;
+    overflow: hidden;
+  }
+  .npc.bearded::after { content: '🧔🏻'; font-size: 36px; margin-bottom: 4px; }
+  .npc.boy-npc {
+    background: linear-gradient(180deg, #efe1d2, #c79f7c);
+    border-color: #6e4a1f;
+  }
+  .npc.boy-npc::after { content: '👧'; font-size: 36px; margin-bottom: 4px; }
+  .order-slot {
+    width: 46px; height: 46px;
+    background: #fff7e6;
+    border: 2.5px solid var(--brown);
+    border-radius: 12px;
+    display: grid; place-items: center;
+    font-size: 24px;
+    margin-left: auto;
+    box-shadow: inset 0 -3px 0 rgba(0,0,0,.1);
+  }
+
+  /* Info banner */
+  .banner {
+    position: relative; z-index: 2;
+    margin: 10px 10px 0;
+  }
+  .banner .info {
+    background: #fff7e6;
+    border: 2.5px solid var(--brown);
+    border-radius: 16px;
+    padding: 8px 12px 8px 46px;
+    color: var(--ink);
+    font-weight: 800; font-size: 13px;
+    position: relative;
+    box-shadow: 0 3px 0 rgba(0,0,0,.18);
+    display: flex; align-items: center;
+  }
+  .banner .info::before {
+    content: 'i';
+    position: absolute; left: 8px; top: 50%;
+    transform: translateY(-50%);
+    width: 28px; height: 28px;
+    background: linear-gradient(180deg, #6ec0ff, #2b8be6);
+    border: 2px solid #155a92;
+    border-radius: 50%;
+    color: #fff; font-style: italic; font-weight: 900;
+    display: grid; place-items: center;
+    box-shadow: 0 2px 0 rgba(0,0,0,.2);
+  }
+
+  /* Board */
+  .board-wrap {
+    position: relative; z-index: 1;
+    margin: 10px 10px 14px;
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+  }
+  .board {
+    flex: 1;
+    padding: 8px;
+    background: linear-gradient(180deg, var(--board-a), var(--board-b));
+    border: 3px solid #2f7ba4;
+    border-radius: 16px;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    grid-template-rows: repeat(8, 1fr);
+    gap: 4px;
+    overflow: hidden;
+  }
+  .cell {
+    background: var(--cell);
+    border: 1px solid var(--cell-line);
+    border-radius: 8px;
+    position: relative;
+    display: grid; place-items: center;
+    transition: background 80ms ease;
+    user-select: none;
+  }
+  .cell.drop-ok      { background: #ffe16a; box-shadow: inset 0 0 0 2px #c98a1c; }
+  .cell.drop-merge   { background: #b6f0a0; box-shadow: inset 0 0 0 2px #2f8a2a; }
+  .cell.drop-upgrade { background: #b6f0a0; box-shadow: inset 0 0 0 2px #2f8a2a; }
+  .cell.drop-block   { background: #ffd884; box-shadow: inset 0 0 0 2px #b86a14; }
+  .cell.drop-bad     { background: #ff8a8a; box-shadow: inset 0 0 0 2px #b22f2f; }
+
+  .item {
+    width: 84%;
+    height: 84%;
+    border-radius: 10px;
+    background: linear-gradient(180deg, #fff, #e6e6e6);
+    border: 2px solid #6e4a1f;
+    box-shadow: 0 2px 0 rgba(0,0,0,.18);
+    display: grid; place-items: center;
+    position: relative;
+    cursor: grab;
+    font-size: 23px;
+    line-height: 1;
+    touch-action: none;
+  }
+  .item:active { cursor: grabbing; }
+  .item .tier-pill {
+    position: absolute;
+    top: -6px; right: -6px;
+    background: #4a2a0a;
+    color: #ffe7a8;
+    font-size: 10px; font-weight: 800;
+    padding: 1px 5px;
+    border-radius: 999px;
+    border: 1px solid #ffe7a8;
+  }
+  .item.maxed .tier-pill { background: #7a1f1f; color: #ffd0d0; border-color: #ffd0d0; }
+  .item.dragging { opacity: .25; }
+
+  /* Producers / chests / currency — the blocked targets */
+  .item.container { background: radial-gradient(circle at 50% 28%, #fff, #d7b384 60%, #b07e3e); border-color: #6e4a1f; }
+  .item.chest     { background: radial-gradient(circle at 50% 28%, #ffe9a8, #e8b34a 65%, #b07e1e); border-color: #6e4a1f; }
+  .item.currency  { background: radial-gradient(circle at 50% 28%, #fff, #d8dde2 60%, #aab2bb); border-color: #586068; }
+  .item .type-tag {
+    position: absolute;
+    bottom: -7px; left: 50%;
+    transform: translateX(-50%);
+    background: #4a2a0a;
+    color: #ffd9a8;
+    font-size: 8px; font-weight: 800; letter-spacing: .3px;
+    padding: 1px 5px;
+    border-radius: 999px;
+    border: 1px solid #ffd9a8;
+    white-space: nowrap;
+  }
+
+  /* Blue gem (T6 merge stone) — for contrast, also a blocked target */
+  .item.gem {
+    background: radial-gradient(circle at 35% 30%, #fff, #6cf 40%, #19c 75%);
+    border-color: #1a5b87;
+    box-shadow: 0 0 10px #6cf, 0 2px 0 rgba(0,0,0,.18);
+  }
+  .item.gem .type-tag { background: #c98a1c; color: #fff; border-color: #fff; }
+  .item.gem .glyph { filter: drop-shadow(0 0 4px #fff); }
+
+  /* Green Crystal (greenstone) — the hero item */
+  .item.greenstone {
+    background: radial-gradient(circle at 35% 28%, #f2fff6, #57e08a 45%, #1f9d52 78%);
+    border-color: #14753b;
+    box-shadow: 0 0 11px #6ef0a0, 0 2px 0 rgba(0,0,0,.18);
+  }
+  .item.greenstone .glyph { filter: hue-rotate(85deg) saturate(1.6) drop-shadow(0 0 4px #d6ffe6); }
+  .item.greenstone .type-tag { background: #14753b; color: #eafff0; border-color: #eafff0; }
+
+  /* upgrade flash */
+  @keyframes upgrade-flash {
+    0%   { box-shadow: 0 0 0 0 #b6ffccdd, 0 2px 0 rgba(0,0,0,.18); transform: scale(1); }
+    50%  { box-shadow: 0 0 20px 13px #8cf5b0aa, 0 2px 0 rgba(0,0,0,.18); transform: scale(1.2); }
+    100% { box-shadow: 0 0 0 0 #b6ffcc00, 0 2px 0 rgba(0,0,0,.18); transform: scale(1); }
+  }
+  .item.upgrading { animation: upgrade-flash 600ms ease; }
+
+  /* refuse / block shake */
+  @keyframes shake {
+    0%,100% { transform: translateX(0); }
+    20% { transform: translateX(-4px) rotate(-3deg); }
+    40% { transform: translateX(4px) rotate(3deg); }
+    60% { transform: translateX(-3px) rotate(-2deg); }
+    80% { transform: translateX(3px) rotate(2deg); }
+  }
+  .item.shake { animation: shake 360ms ease; }
+
+  /* Drag ghost */
+  #ghost {
+    position: fixed; left: 0; top: 0;
+    width: 56px; height: 56px;
+    pointer-events: none;
+    z-index: 9999;
+    display: none;
+  }
+  #ghost.is-dragging { display: block; }
+
+  /* Toast */
+  .toast {
+    position: absolute;
+    left: 50%; bottom: 96px;
+    transform: translateX(-50%) translateY(12px);
+    max-width: 86%;
+    background: rgba(34, 22, 8, 0.94);
+    color: #fff7e6;
+    border: 2px solid #ffd9a8;
+    border-radius: 14px;
+    padding: 9px 16px;
+    font-weight: 800; font-size: 13px;
+    text-align: center;
+    box-shadow: 0 6px 18px rgba(0,0,0,.4);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 160ms ease, transform 160ms ease;
+    z-index: 60;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.refuse { border-color: #ff9a9a; }
+  .toast.block  { border-color: #ffcf7a; }
+  .toast.ok     { border-color: #9af0b4; }
+
+  /* First-use tutorial coachmark */
+  .tut-veil {
+    position: absolute; inset: 0;
+    background: rgba(8, 14, 28, 0.55);
+    z-index: 40;
+    display: none;
+    align-items: center; justify-content: center;
+    padding: 22px;
+  }
+  .tut-veil.show { display: flex; }
+  .coach {
+    background: linear-gradient(180deg, #fffbe9, #f3e4c2);
+    border: 3px solid var(--brown);
+    border-radius: 20px;
+    padding: 16px 18px;
+    max-width: 300px;
+    text-align: center;
+    color: var(--ink);
+    box-shadow: var(--shadow);
+    animation: pop 200ms cubic-bezier(.2,1.3,.4,1);
+  }
+  @keyframes pop { from { transform: translateY(16px) scale(.96); opacity: 0; } to { transform: none; opacity: 1; } }
+  .coach .hand { font-size: 40px; }
+  .coach h4 { margin: 6px 0 4px; font-size: 17px; }
+  .coach p { margin: 0; font-size: 14px; font-weight: 700; }
+  .coach .hint { margin-top: 12px; font-size: 11px; font-weight: 800; color: #8a6a3a; letter-spacing: .4px; text-transform: uppercase; }
+  /* glow eligible items underneath the veil */
+  .screen.tut .item.tut-glow {
+    z-index: 45;
+    box-shadow: 0 0 0 3px #6ef0a0, 0 0 16px 6px #6ef0a0cc;
+    border-radius: 12px;
+  }
+
+  /* Reset FAB */
+  .reset-fab {
+    position: absolute;
+    right: 14px; top: 14px;
+    z-index: 3;
+    background: rgba(255,255,255,.85);
+    border: 2px solid var(--brown);
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-weight: 800; font-size: 11px;
+    color: var(--ink);
+    cursor: pointer;
+    box-shadow: 0 2px 0 rgba(0,0,0,.2);
+  }
+
+  /* Bottom nav */
+  .nav {
+    position: relative; z-index: 2;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 18px 14px;
+    background: linear-gradient(180deg, #b78a5e, #8e6537);
+    border-top: 3px solid #5b4022;
+    flex-shrink: 0;
+  }
+  .nav .btn {
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    border: 3px solid var(--brown);
+    background: linear-gradient(180deg, #fff7e6, #f3e4c2);
+    display: grid; place-items: center;
+    box-shadow: 0 4px 0 rgba(0,0,0,.25);
+    position: relative;
+    font-size: 20px; color: var(--ink);
+    cursor: pointer;
+  }
+  .nav .btn.center {
+    width: 66px; height: 66px;
+    background: radial-gradient(circle at 50% 35%, #fff0a8, #ffcd34 60%, #c98a1c);
+    margin-top: -20px;
+  }
+
+  /* ── Side panel ───────────────────────────────────────────── */
+  .panel {
+    width: 380px;
+    max-width: 92vw;
+    flex: 0 1 auto;
+    display: flex; flex-direction: column;
+    gap: 16px;
+  }
+  .panel h1 {
+    font-size: 22px; margin: 4px 0 2px;
+    color: #fff;
+  }
+  .panel .sub { color: #9fb3c8; font-size: 13px; margin: 0 0 4px; }
+  .card {
+    background: #16233a;
+    border: 1px solid #28395a;
+    border-radius: 14px;
+    padding: 14px 16px;
+  }
+  .card h3 {
+    margin: 0 0 10px; font-size: 13px;
+    text-transform: uppercase; letter-spacing: .6px; color: #8fb0d8;
+  }
+  .legend { display: grid; gap: 7px; }
+  .legend .row { display: flex; align-items: center; gap: 10px; font-size: 13px; }
+  .swatch {
+    width: 26px; height: 26px; border-radius: 7px; flex: 0 0 auto;
+    display: grid; place-items: center; font-size: 15px;
+    border: 2px solid #6e4a1f;
+  }
+  .swatch.greenstone { background: radial-gradient(circle at 35% 28%, #f2fff6, #57e08a 45%, #1f9d52 78%); border-color:#14753b; }
+  .swatch.order { background: linear-gradient(180deg,#fff,#e6e6e6); }
+  .swatch.container { background: radial-gradient(circle at 50% 28%, #fff, #d7b384 60%, #b07e3e); }
+  .swatch.chest { background: radial-gradient(circle at 50% 28%, #ffe9a8, #e8b34a 65%, #b07e1e); }
+  .swatch.currency { background: radial-gradient(circle at 50% 28%, #fff, #d8dde2 60%, #aab2bb); border-color:#586068; }
+  .swatch.gem { background: radial-gradient(circle at 35% 30%, #fff, #6cf 40%, #19c 75%); border-color:#1a5b87; }
+  .tag { font-size: 11px; font-weight: 800; padding: 1px 7px; border-radius: 999px; margin-left: auto; }
+  .tag.ok { background: #16361f; color: #8af0aa; border: 1px solid #2f8a2a; }
+  .tag.no { background: #3a1818; color: #ff9a9a; border: 1px solid #b22f2f; }
+
+  .ctrls { display: grid; gap: 12px; }
+  .ctrl-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .ctrl-row label { font-size: 13px; font-weight: 700; }
+  .ctrl-row .desc { font-size: 11px; color: #7f93ab; margin-top: 2px; }
+  select, .switch {
+    font: inherit;
+  }
+  select {
+    background: #0e1726; color: #e8e8ee;
+    border: 1px solid #34507a; border-radius: 8px;
+    padding: 5px 8px; font-size: 13px; font-weight: 700;
+  }
+  .switch {
+    position: relative; width: 50px; height: 28px; flex: 0 0 auto;
+    border-radius: 999px; cursor: pointer;
+    background: #2f8a2a; border: 1px solid #1f5c1c;
+    transition: background 140ms ease;
+  }
+  .switch::after {
+    content: ''; position: absolute; top: 2px; left: 24px;
+    width: 22px; height: 22px; border-radius: 50%;
+    background: #fff; transition: left 140ms ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,.5);
+  }
+  .switch.off { background: #4a3a3a; border-color: #6a2a2a; }
+  .switch.off::after { left: 2px; }
+  .code { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 12px; color: #d6e4f5; }
+
+  /* Analytics log */
+  .log-head { display:flex; align-items:center; justify-content:space-between; margin-bottom: 8px; }
+  .log-clear { background:none; border:1px solid #34507a; color:#9fb3c8; border-radius:7px; font-size:11px; padding:3px 8px; cursor:pointer; }
+  .counts { display:flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+  .count { background:#0e1726; border:1px solid #28395a; border-radius:8px; padding:6px 10px; font-size:12px; }
+  .count b { font-size:16px; display:block; }
+  .count.ok b { color:#8af0aa; }
+  .count.no b { color:#ff9a9a; }
+  table.evlog { width:100%; border-collapse: collapse; font-family: ui-monospace,"SF Mono",Menlo,Consolas,monospace; font-size: 11px; }
+  table.evlog th { text-align:left; color:#6f86a4; font-weight:700; padding:3px 6px; border-bottom:1px solid #28395a; position: sticky; top: 0; background:#16233a; }
+  table.evlog td { padding:3px 6px; border-bottom:1px solid #1e2c45; white-space: nowrap; }
+  .evlog .o-success { color:#8af0aa; }
+  .evlog .o-refused_wrong_type { color:#ff9a9a; }
+  .evlog .o-blocked_max_tier { color:#ffcf7a; }
+  .log-scroll { max-height: 220px; overflow:auto; border-radius: 8px; }
+  .log-empty { color:#5d7390; font-size:12px; padding:10px 2px; }
+  .parity { font-size:11px; color:#7f93ab; margin-top:10px; line-height:1.5; }
+  .parity code { color:#9fe0b4; }
+  .footnote { color:#5d7390; font-size:11px; }
+  a.prd { color:#7fb0ff; text-decoration: none; }
+  a.prd:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+  <!-- ── Phone ──────────────────────────────────────────────── -->
+  <div class="phone" aria-label="Mergedom Green Crystal demo">
+    <div class="screen" id="screen">
+      <div class="room-bg"></div>
+
+      <button class="reset-fab" id="resetBtn" type="button">↻ Reset</button>
+
+      <div class="hud">
+        <div class="pill energy"><span class="badge"></span>310<span class="plus">+</span></div>
+        <div class="pill greenstone"><span class="badge"></span><span id="gcCount">4</span></div>
+        <div class="pill coin"><span class="badge"></span>1096<span class="plus">+</span></div>
+        <button class="cog" aria-label="Settings">⚙</button>
+      </div>
+
+      <div class="avatars">
+        <div class="order">
+          <div class="npc bearded" aria-label="Customer"></div>
+          <div class="order-slot">🧼</div>
+        </div>
+        <div class="order">
+          <div class="npc boy-npc" aria-label="Customer"></div>
+          <div class="order-slot">🍪</div>
+        </div>
+      </div>
+
+      <div class="banner">
+        <div class="info"><span id="infoText">Drag a Green Crystal onto a regular order item to upgrade it.</span></div>
+      </div>
+
+      <div class="board-wrap">
+        <div class="board" id="board"></div>
+      </div>
+
+      <!-- toast -->
+      <div class="toast" id="toast"></div>
+
+      <!-- first-use tutorial -->
+      <div class="tut-veil" id="tutVeil">
+        <div class="coach">
+          <div class="hand">👆💎</div>
+          <h4>Green Crystal</h4>
+          <p>Drag it onto a regular item to upgrade it one tier. It will not work on producers, chests, or currency.</p>
+          <div class="hint">Tap anywhere to continue</div>
+        </div>
+      </div>
+
+      <div class="nav">
+        <button class="btn" aria-label="Inventory">🎒</button>
+        <button class="btn" aria-label="Shop">🏪</button>
+        <button class="btn center" aria-label="Home">🏠</button>
+        <button class="btn" aria-label="Tasks">📋</button>
+        <button class="btn" aria-label="Book">📖</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Side panel ─────────────────────────────────────────── -->
+  <div class="panel">
+    <div>
+      <h1>Green Crystal — Order-Only Merge Booster</h1>
+      <p class="sub">Interactive prototype for the Mergedom PRD. Drag the green crystals on the board. Producers, chests, currency, and the blue gem refuse. Order items upgrade.</p>
+    </div>
+
+    <div class="card">
+      <h3>What is on the board</h3>
+      <div class="legend">
+        <div class="row"><span class="swatch greenstone">💎</span> <span><b>Green Crystal</b> — drag me</span><span class="tag ok">grant</span></div>
+        <div class="row"><span class="swatch order">🧼</span> <span><b>Order items</b> — Soap, Tools, Cleaning, Cookies, Toys</span><span class="tag ok">upgrades</span></div>
+        <div class="row"><span class="swatch container">🧺</span> <span><b>Cleaning Set</b> — producer / container</span><span class="tag no">refuses</span></div>
+        <div class="row"><span class="swatch chest">🎁</span> <span><b>Chest</b></span><span class="tag no">refuses</span></div>
+        <div class="row"><span class="swatch currency">🪙</span> <span><b>Coins / Energy</b></span><span class="tag no">refuses</span></div>
+        <div class="row"><span class="swatch gem">💎</span> <span><b>Blue gem</b> — T6 Merge Stone</span><span class="tag no">refuses</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Kinoa config (live)</h3>
+      <div class="ctrls">
+        <div class="ctrl-row">
+          <div>
+            <label for="">GreenCrystal.IsWorking</label>
+            <div class="desc">Kill switch. Off = the crystal is inert.</div>
+          </div>
+          <div class="switch" id="killSwitch" role="switch" aria-checked="true" tabindex="0"></div>
+        </div>
+        <div class="ctrl-row">
+          <div>
+            <label for="capSel">MaxTargetTier</label>
+            <div class="desc">Optional cap on the tier it can produce. Default no cap.</div>
+          </div>
+          <select id="capSel">
+            <option value="chain_max" selected>chain_max</option>
+            <option value="7">7</option>
+            <option value="5">5</option>
+          </select>
+        </div>
+        <div class="ctrl-row">
+          <div>
+            <label>First-use tutorial</label>
+            <div class="desc">Fires once on first crystal drag-start.</div>
+          </div>
+          <button class="log-clear" id="replayTut" type="button">Replay</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="log-head">
+        <h3 style="margin:0">booster_used event log</h3>
+        <button class="log-clear" id="logClear" type="button">Clear</button>
+      </div>
+      <div class="counts">
+        <div class="count ok"><b id="cSuccess">0</b>success</div>
+        <div class="count no"><b id="cRefused">0</b>refused</div>
+        <div class="count no"><b id="cBlocked">0</b>blocked_max</div>
+        <div class="count"><b id="cTotal">0</b>total rows</div>
+      </div>
+      <div class="log-scroll">
+        <table class="evlog">
+          <thead>
+            <tr><th>#</th><th>booster</th><th>used_on</th><th>family</th><th>outcome</th><th>consumed</th></tr>
+          </thead>
+          <tbody id="logBody">
+            <tr><td colspan="6" class="log-empty">No events yet. Drag a crystal onto something.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="parity">Parity caveat — a greenstone row is logged on every drop onto a real item, including refusals and blocks. Real usage is <code>booster='greenstone' AND outcome='success'</code>, never a raw count.</p>
+    </div>
+
+    <p class="footnote">Prototype, not final art. A green recolor of the gem stands in for the Green Crystal. PRD: <span class="code">green-crystal.md</span> · <span class="code">green-crystal-notion.md</span></p>
+  </div>
+
+  <div id="ghost"></div>
+
+<script>
+/* ─────────────────────────────────────────────────────────────
+   Item model. Order families + tier ceilings from mergedom_items.md
+   (mirrors the balancing spreadsheet). Blocked types per the PRD
+   eligibility predicate.
+   ──────────────────────────────────────────────────────────── */
+const FAMILIES = {
+  soap:   { name: 'Soap',           idp: '12', glyph: '🧼', maxTier: 5  },
+  clean:  { name: 'Cleaning Tools', idp: '11', glyph: '🧴', maxTier: 12 },
+  tool:   { name: 'Tools',          idp: '31', glyph: '🔧', maxTier: 11 },
+  cookie: { name: 'Cookies',        idp: '24', glyph: '🍪', maxTier: 5  },
+  toy:    { name: 'Toy Animals',    idp: '41', glyph: '🧸', maxTier: 9  }
+};
+
+/* Blocked pieces carry an explicit id + glyph + tag label */
+const BLOCKED = {
+  cleanset: { kind: 'container', id: '10_04', glyph: '🧺', tag: 'PRODUCER', name: 'Cleaning Set' },
+  chest:    { kind: 'chest',     id: '62_01', glyph: '🎁', tag: 'CHEST',    name: 'Safe Box' },
+  coin:     { kind: 'currency',  id: '5_03',  glyph: '🪙', tag: 'COINS',    name: 'Coins' },
+  energy:   { kind: 'currency',  id: '4_02',  glyph: '⚡', tag: 'ENERGY',   name: 'Energy' },
+  gem:      { kind: 'gem',       id: '201_06',glyph: '💎', tag: 'T6 GEM',   name: 'Merge Stone' }
+};
+
+/* Initial board. 7 cols × 8 rows, indices 0–55.  GC = Green Crystal */
+const INITIAL = {
+  8:  { kind: 'gc' },
+  10: { kind: 'order', f: 'soap',   t: 2 },
+  12: { kind: 'order', f: 'tool',   t: 4 },
+  15: { kind: 'order', f: 'soap',   t: 1 },
+  16: { kind: 'order', f: 'soap',   t: 1 },     // merge pair → Soap T2
+  18: { kind: 'order', f: 'cookie', t: 3 },
+  22: { kind: 'gc' },
+  24: { kind: 'order', f: 'clean',  t: 5 },
+  26: { kind: 'order', f: 'toy',    t: 4 },
+  30: { kind: 'blocked', b: 'cleanset' },
+  32: { kind: 'blocked', b: 'chest' },
+  36: { kind: 'gc' },
+  38: { kind: 'order', f: 'soap',   t: 5 },      // MAX (Soap max = 5)
+  40: { kind: 'order', f: 'cookie', t: 5 },      // MAX (Cookies max = 5)
+  43: { kind: 'blocked', b: 'coin' },
+  45: { kind: 'blocked', b: 'energy' },
+  47: { kind: 'blocked', b: 'gem' },
+  50: { kind: 'gc' }
+};
+
+const CELLS = 56;
+
+const board   = document.getElementById('board');
+const ghost   = document.getElementById('ghost');
+const toastEl = document.getElementById('toast');
+const screenEl = document.getElementById('screen');
+const tutVeil = document.getElementById('tutVeil');
+
+/* config state (simulated Kinoa) */
+let cfg = { isWorking: true, maxTargetTier: Infinity };
+let tutSeen = false;
+let tutOpen = false;
+
+function pad2(n){ return String(n).padStart(2, '0'); }
+function usedOnOrder(f, t){ return FAMILIES[f].idp + '_' + pad2(t); }
+
+/* ── Build board ─────────────────────────────────────────── */
+let cells = [];
+function buildBoard() {
+  board.innerHTML = '';
+  cells = [];
+  for (let i = 0; i < CELLS; i++) {
+    const c = document.createElement('div');
+    c.className = 'cell';
+    c.dataset.idx = i;
+    if (INITIAL[i]) c.appendChild(makePiece(INITIAL[i]));
+    board.appendChild(c);
+    cells.push(c);
+  }
+  refreshGcCount();
+}
+function makePiece(data) {
+  const el = document.createElement('div');
+  el.dataset.kind = data.kind;
+  if (data.kind === 'gc') {
+    el.className = 'item greenstone';
+    el.innerHTML = '<span class="glyph">💎</span><span class="type-tag">GREEN</span>';
+  } else if (data.kind === 'blocked') {
+    const b = BLOCKED[data.b];
+    el.className = 'item ' + b.kind;
+    el.dataset.block = data.b;
+    el.dataset.id = b.id;
+    el.innerHTML = '<span class="glyph">' + b.glyph + '</span><span class="type-tag">' + b.tag + '</span>';
+  } else { // order
+    const fam = FAMILIES[data.f];
+    el.className = 'item order' + (data.t >= fam.maxTier ? ' maxed' : '');
+    el.dataset.family = data.f;
+    el.dataset.tier = String(data.t);
+    el.innerHTML = '<span class="glyph">' + fam.glyph + '</span><span class="tier-pill">Lv ' + data.t + '</span>';
+  }
+  return el;
+}
+function refreshGcCount() {
+  document.getElementById('gcCount').textContent = board.querySelectorAll('.item.greenstone').length;
+}
+
+/* ── Classify a Green Crystal drop ───────────────────────── */
+function classifyGc(targetCell) {
+  if (!targetCell) return { kind: 'snap' };                 // off-board
+  const tEl = targetCell.querySelector('.item');
+  if (!tEl) return { kind: 'move' };                        // empty cell
+  const k = tEl.dataset.kind;
+  if (k === 'order') {
+    const fam = FAMILIES[tEl.dataset.family];
+    const t = parseInt(tEl.dataset.tier, 10);
+    const usedOn = usedOnOrder(tEl.dataset.family, t);
+    if (t >= fam.maxTier)          return { kind: 'block', tEl, usedOn, family: fam.idp, reason: 'chain' };
+    if (t + 1 > cfg.maxTargetTier) return { kind: 'block', tEl, usedOn, family: fam.idp, reason: 'cap' };
+    return { kind: 'upgrade', tEl, usedOn, family: fam.idp, f: tEl.dataset.family, t };
+  }
+  // any non-order item = refuse
+  const id = tEl.dataset.id || (k === 'gc' ? 'greenstone' : '');
+  const family = id.includes('_') ? id.split('_')[0] : 'greenstone';
+  return { kind: 'refuse', tEl, usedOn: id || 'greenstone', family };
+}
+
+/* Classify a normal order-item drop (same-tier merge) */
+function classifyOrder(srcEl, targetCell) {
+  if (!targetCell) return 'snap';
+  const tEl = targetCell.querySelector('.item');
+  if (!tEl) return 'move';
+  if (tEl === srcEl) return 'snap';
+  if (tEl.dataset.kind === 'order'
+      && tEl.dataset.family === srcEl.dataset.family
+      && tEl.dataset.tier === srcEl.dataset.tier) {
+    const fam = FAMILIES[srcEl.dataset.family];
+    if (parseInt(srcEl.dataset.tier, 10) < fam.maxTier) return 'merge';
+  }
+  return 'bad';
+}
+
+/* ── Drag and drop ───────────────────────────────────────── */
+let drag = null, lastHover = null;
+function setGhost(x, y){ ghost.style.transform = 'translate(' + (x-28) + 'px,' + (y-28) + 'px) scale(1.1)'; }
+function clearHover(){ if (lastHover) lastHover.classList.remove('drop-ok','drop-merge','drop-upgrade','drop-block','drop-bad'); lastHover = null; }
+
+document.addEventListener('pointerdown', (e) => {
+  // tutorial is open → any tap closes it
+  if (tutOpen) { closeTut(); return; }
+  const target = e.target.closest('.item');
+  if (!target) return;
+
+  // first crystal drag-start → fire one-time tutorial, do not start the drag
+  if (target.dataset.kind === 'gc' && cfg.isWorking && !tutSeen) {
+    e.preventDefault();
+    openTut();
+    return;
+  }
+
+  e.preventDefault();
+  drag = { source: target, isGc: target.dataset.kind === 'gc' };
+  const gi = target.cloneNode(true);
+  gi.style.width = '100%'; gi.style.height = '100%';
+  ghost.innerHTML = ''; ghost.appendChild(gi);
+  ghost.classList.add('is-dragging');
+  setGhost(e.clientX, e.clientY);
+  target.classList.add('dragging');
+});
+
+document.addEventListener('pointermove', (e) => {
+  if (!drag) return;
+  setGhost(e.clientX, e.clientY);
+  const el = document.elementFromPoint(e.clientX, e.clientY);
+  const cell = el && el.closest && el.closest('.cell');
+  if (cell !== lastHover) {
+    clearHover();
+    if (cell) {
+      lastHover = cell;
+      if (drag.isGc) {
+        const r = classifyGc(cell);
+        if (r.kind === 'move')    cell.classList.add('drop-ok');
+        if (r.kind === 'upgrade') cell.classList.add('drop-upgrade');
+        if (r.kind === 'block')   cell.classList.add('drop-block');
+        if (r.kind === 'refuse')  cell.classList.add('drop-bad');
+      } else {
+        const k = classifyOrder(drag.source, cell);
+        if (k === 'move')  cell.classList.add('drop-ok');
+        if (k === 'merge') cell.classList.add('drop-merge');
+        if (k === 'bad')   cell.classList.add('drop-bad');
+      }
+    }
+  }
+});
+
+document.addEventListener('pointerup', (e) => {
+  if (!drag) return;
+  ghost.classList.remove('is-dragging'); ghost.innerHTML = '';
+  const el = document.elementFromPoint(e.clientX, e.clientY);
+  const cell = el && el.closest && el.closest('.cell');
+  const src = drag.source, isGc = drag.isGc;
+  src.classList.remove('dragging');
+  clearHover();
+  drag = null;
+
+  if (isGc) handleGcDrop(src, cell);
+  else handleOrderDrop(src, cell);
+});
+
+document.addEventListener('pointercancel', () => {
+  if (!drag) return;
+  ghost.classList.remove('is-dragging'); ghost.innerHTML = '';
+  drag.source.classList.remove('dragging'); clearHover(); drag = null;
+});
+
+function handleGcDrop(src, cell) {
+  // kill switch off → inert
+  if (!cfg.isWorking) {
+    toast('GreenCrystal.IsWorking = false · crystal is inert', 'block');
+    return;
+  }
+  const r = classifyGc(cell);
+  if (r.kind === 'move') { cell.appendChild(src); return; }
+  if (r.kind === 'snap') return;                       // off-board, silent, no event
+
+  if (r.kind === 'upgrade') {
+    const newT = r.t + 1;
+    r.tEl.remove(); src.remove();
+    const up = makePiece({ kind: 'order', f: r.f, t: newT });
+    cell.appendChild(up);
+    up.classList.add('upgrading');
+    setTimeout(() => up.classList.remove('upgrading'), 650);
+    refreshGcCount();
+    logEvent({ usedOn: usedOnOrder(r.f, newT), family: r.family, outcome: 'success', consumed: true });
+    toast('Upgraded to ' + FAMILIES[r.f].name + ' Lv ' + newT, 'ok');
+    if (tutOpen) closeTut();
+  } else if (r.kind === 'block') {
+    shake(r.tEl);
+    const msg = r.reason === 'cap'
+      ? "The Green Crystal can't upgrade this item any further."
+      : 'This item is already at max tier.';
+    toast(msg, 'block');
+    logEvent({ usedOn: r.usedOn, family: r.family, outcome: 'blocked_max_tier', consumed: false });
+  } else if (r.kind === 'refuse') {
+    shake(r.tEl);
+    toast('Green Crystal only works on regular items.', 'refuse');
+    logEvent({ usedOn: r.usedOn, family: r.family, outcome: 'refused_wrong_type', consumed: false });
+  }
+}
+
+function handleOrderDrop(src, cell) {
+  const k = classifyOrder(src, cell);
+  if (k === 'move') { cell.appendChild(src); return; }
+  if (k === 'merge') {
+    const f = src.dataset.family;
+    const newT = parseInt(src.dataset.tier, 10) + 1;
+    cell.querySelector('.item').remove(); src.remove();
+    const up = makePiece({ kind: 'order', f, t: newT });
+    cell.appendChild(up);
+    up.classList.add('upgrading');
+    setTimeout(() => up.classList.remove('upgrading'), 650);
+  }
+  // 'bad' / 'snap' → silent snap back
+}
+
+function shake(el){ el.classList.add('shake'); setTimeout(() => el.classList.remove('shake'), 380); }
+
+/* ── Toast ───────────────────────────────────────────────── */
+let toastTimer = null;
+function toast(msg, type) {
+  toastEl.textContent = msg;
+  toastEl.className = 'toast show' + (type ? ' ' + type : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => { toastEl.className = 'toast'; }, 1700);
+}
+
+/* ── First-use tutorial ──────────────────────────────────── */
+function openTut() {
+  tutOpen = true;
+  screenEl.classList.add('tut');
+  board.querySelectorAll('.item.order').forEach(el => {
+    const fam = FAMILIES[el.dataset.family];
+    if (parseInt(el.dataset.tier, 10) < fam.maxTier) el.classList.add('tut-glow');
+  });
+  tutVeil.classList.add('show');
+}
+function closeTut() {
+  tutOpen = false; tutSeen = true;
+  screenEl.classList.remove('tut');
+  board.querySelectorAll('.tut-glow').forEach(el => el.classList.remove('tut-glow'));
+  tutVeil.classList.remove('show');
+}
+
+/* ── Analytics log ───────────────────────────────────────── */
+let seq = 0, nSuccess = 0, nRefused = 0, nBlocked = 0;
+const logBody = document.getElementById('logBody');
+function logEvent({ usedOn, family, outcome, consumed }) {
+  seq++;
+  if (outcome === 'success') nSuccess++;
+  else if (outcome === 'refused_wrong_type') nRefused++;
+  else if (outcome === 'blocked_max_tier') nBlocked++;
+  if (seq === 1) logBody.innerHTML = '';
+  const tr = document.createElement('tr');
+  tr.innerHTML =
+    '<td>' + seq + '</td>' +
+    '<td>greenstone</td>' +
+    '<td>' + usedOn + '</td>' +
+    '<td>' + family + '</td>' +
+    '<td class="o-' + outcome + '">' + outcome + '</td>' +
+    '<td>' + consumed + '</td>';
+  logBody.insertBefore(tr, logBody.firstChild);
+  document.getElementById('cSuccess').textContent = nSuccess;
+  document.getElementById('cRefused').textContent = nRefused;
+  document.getElementById('cBlocked').textContent = nBlocked;
+  document.getElementById('cTotal').textContent = seq;
+}
+function clearLog() {
+  seq = nSuccess = nRefused = nBlocked = 0;
+  logBody.innerHTML = '<tr><td colspan="6" class="log-empty">No events yet. Drag a crystal onto something.</td></tr>';
+  ['cSuccess','cRefused','cBlocked','cTotal'].forEach(id => document.getElementById(id).textContent = '0');
+}
+
+/* ── Controls ────────────────────────────────────────────── */
+const killSwitch = document.getElementById('killSwitch');
+function setKill(on) {
+  cfg.isWorking = on;
+  killSwitch.classList.toggle('off', !on);
+  killSwitch.setAttribute('aria-checked', String(on));
+}
+killSwitch.addEventListener('click', () => setKill(!cfg.isWorking));
+killSwitch.addEventListener('keydown', (e) => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); setKill(!cfg.isWorking); } });
+
+document.getElementById('capSel').addEventListener('change', (e) => {
+  cfg.maxTargetTier = e.target.value === 'chain_max' ? Infinity : parseInt(e.target.value, 10);
+});
+document.getElementById('replayTut').addEventListener('click', () => { tutSeen = false; toast('Tutorial will fire on next crystal drag-start', 'block'); });
+document.getElementById('logClear').addEventListener('click', clearLog);
+document.getElementById('resetBtn').addEventListener('click', () => { buildBoard(); clearLog(); });
+
+/* ── Init ────────────────────────────────────────────────── */
+buildBoard();
+</script>
+</body>
+</html>
