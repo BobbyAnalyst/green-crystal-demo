@@ -215,20 +215,17 @@
     flex: 1 1 auto;
     min-height: 0;
     display: flex;
-    align-items: center;
-    justify-content: center;
   }
   .board {
-    width: 100%;
-    aspect-ratio: 7 / 9;       /* 7 columns wide, 9 rows tall — square cells */
-    max-height: 100%;
+    flex: 1 1 auto;
+    min-width: 0;
     padding: 8px;
     background: linear-gradient(180deg, var(--board-a), var(--board-b));
     border: 3px solid #2f7ba4;
     border-radius: 16px;
     display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    grid-template-rows: repeat(9, 1fr);
+    grid-template-columns: repeat(7, minmax(0, 1fr));  /* 7 columns that always divide the width */
+    grid-template-rows: repeat(9, minmax(0, 1fr));     /* 9 rows */
     gap: 4px;
     overflow: hidden;
   }
