@@ -236,17 +236,6 @@
       <div class="legend" id="legend"></div>
     </div>
     <div class="card">
-      <h3>Kinoa config (live)</h3>
-      <div class="ctrls">
-        <div class="crow"><div><label>GreenCrystal.IsWorking</label><div class="d">Kill switch. Off = the crystal is inert.</div></div>
-          <div class="switch" id="kill" role="switch" aria-checked="true" tabindex="0"></div></div>
-        <div class="crow"><div><label for="cap">MaxTargetTier</label><div class="d">Optional cap on the tier it can produce. Default no cap.</div></div>
-          <select id="cap"><option value="chain_max" selected>chain_max</option><option value="7">7</option><option value="5">5</option></select></div>
-        <div class="crow"><div><label>First-use tutorial</label><div class="d">Fires once on first crystal drag-start.</div></div>
-          <button class="mini" id="replay" type="button">Replay</button></div>
-      </div>
-    </div>
-    <div class="card">
       <div class="lh"><h3 style="margin:0">booster_used event log</h3><button class="mini" id="clearLog" type="button">Clear</button></div>
       <div class="counts">
         <div class="count ok"><b id="cS">0</b>success</div><div class="count no"><b id="cR">0</b>refused</div>
@@ -424,12 +413,6 @@ function log({uo,fam,outcome,consumed}){
 function clearLog(){ seq=nS=nR=nB=0; logBody.innerHTML='<tr><td colspan="6" class="empty">No events yet. Drag a crystal onto something.</td></tr>'; cS.textContent=cR.textContent=cB.textContent=cT.textContent='0'; }
 
 /* ---------- Controls ---------- */
-const kill=document.getElementById('kill');
-function setKill(on){ cfg.isWorking=on; kill.classList.toggle('off',!on); kill.setAttribute('aria-checked',String(on)); }
-kill.addEventListener('click',()=>setKill(!cfg.isWorking));
-kill.addEventListener('keydown',e=>{ if(e.key===' '||e.key==='Enter'){ e.preventDefault(); setKill(!cfg.isWorking); } });
-document.getElementById('cap').addEventListener('change',e=>cfg.cap=e.target.value==='chain_max'?Infinity:+e.target.value);
-document.getElementById('replay').addEventListener('click',()=>{ tutSeen=false; toast('Tutorial will fire on next crystal drag-start','block'); });
 document.getElementById('clearLog').addEventListener('click',clearLog);
 document.getElementById('reset').addEventListener('click',()=>{ build(); clearLog(); });
 
